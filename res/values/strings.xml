@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Bitcoin Card Terminal</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="LabelCommandS">Command bytes:</string>
+    <string name="CommandBytesS">128 2 0 0 0</string>
+    <string name="SendButton">Send</string>
+    <string name="LabelCurrency">Currency:</string>
+    <string name="AppleSign">Æ</string>
+    <string name="YuanSign">¥</string>
+    <string name="EuroSign">€</string>
+    <string name="DollarSign">$</string>
+    <string name="BTCSign">µ฿</string>
+    <string name="CurrencyText">(\'apples\' - 1Æ ~ 0.4 $)</string>
+    <string name="FeeLabel">Fee:</string>
+    <string name="FeeHint">0</string>
+    <string name="FeeCurrency">Æ</string>
+    <string name="AddressLabel">Receive address:</string>
+    <string name="AddressHint"/>
+    <string name="CourtesyLabel">Acknowledgement:</string>
+    <string name="CourtesyText">Courtesy OK if no PIN required.</string>
+    <string name="OkLabel">OK</string>
+    <string name="CancelLabel">Cancel</string>
+    <string name="DeleteSign">C</string>
+    <string name="LabelPrice">Price:</string>
+    <string name="PriceHint">0.0</string>
+    <string name="LabelTestText">0.00000001</string>
+    <string name="LabelTestText2">Card unlocked in 1s..</string>
+    <string name="ZeroSign">0</string>
+    <string name="OneSign">1</string>
+	<string name="TwoSign">2</string>
+	<string name="ThreeSign">3</string>
+	<string name="FourSign">4</string>
+	<string name="FiveSign">5</string>
+	<string name="SixSign">6</string>
+	<string name="SevenSign">7</string>
+	<string name="EightSign">8</string>
+	<string name="NineSign">9</string>
+	<string name="HistoryHeaderText">History:</string>
+	<string name="NoPINText">No PIN required by your card for smaller amounts.</string>
+	<string name="CardReadyText">No card.</string>
+</resources>

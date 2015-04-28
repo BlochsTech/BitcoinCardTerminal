@@ -1,0 +1,6 @@
+
+    <resources>
+        <color name="WhiteNothing">#00FFFFFF</color>
+        <color name="ThinRed">#CCFFCCCC</color>
+        <color name="ThinBlue">#CCCCCCFF</color>
+    </resources>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <TextView
+        android:id="@+id/claimedShortCharge"
+	    android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="20dp"
+	    android:text="@string/LabelTestText"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="18sp" />
+    
+    <TextView
+	    android:id="@+id/cardShortCharge"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+		android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_width="100dp"
+	    android:layout_height="match_parent"
+	    android:layout_marginTop="20dp"
+	    android:layout_marginLeft="00dip"
+	    android:text="@string/LabelTestText"
+	    android:textAppearance="?android:attr/textAppearanceLarge"
+	    android:textSize="18sp" />
+    
+    <TextView
+	    android:id="@+id/claimedCharge"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+		android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_width="100dp"
+	    android:layout_height="match_parent"
+	    android:layout_marginTop="0dp"
+	    android:layout_marginLeft="165dip"
+	    android:gravity="right"
+	    android:text="@string/LabelTestText"
+	    android:textAppearance="?android:attr/textAppearanceLarge"
+	    android:textSize="15sp" />
+    <TextView
+	    android:id="@+id/claimedChargeBTC"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+		android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_width="100dp"
+	    android:layout_height="match_parent"
+	    android:layout_marginTop="20dp"
+	    android:layout_marginLeft="165dip"
+	    android:gravity="right"
+	    android:text="@string/LabelTestText"
+	    android:textAppearance="?android:attr/textAppearanceLarge"
+	    android:textSize="15sp" />
+    
+    <TextView
+	    android:id="@+id/pinCode"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+		android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_width="100dp"
+	    android:layout_height="match_parent"
+	    android:layout_marginTop="60dp"
+	    android:layout_marginLeft="0dip"
+	    android:text="@string/LabelTestText"
+	    android:textAppearance="?android:attr/textAppearanceLarge"
+	    android:textSize="15sp" />
+    <TextView
+	    android:id="@+id/cardReadyText"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+		android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_width="160dp"
+	    android:layout_height="match_parent"
+	    android:layout_marginTop="60dp"
+	    android:layout_marginLeft="105dip"
+	    android:gravity="right"
+	    android:text="@string/CardReadyText"
+	    android:textAppearance="?android:attr/textAppearanceLarge"
+	    android:textSize="15sp" />
+    
+    <TextView
+	    android:id="@+id/noPINText"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+		android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_width="200dp"
+	    android:layout_height="match_parent"
+	    android:layout_marginTop="160dp"
+	    android:layout_marginLeft="40dip"
+	    android:text="@string/NoPINText"
+	    android:textAppearance="?android:attr/textAppearanceLarge"
+	    android:textSize="20sp" />
+
+    <Button
+	    android:id="@+id/sevenPinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="0dp"
+	    android:layout_marginTop="90dp"
+	    android:text="@string/SevenSign" />
+    <Button
+	    android:id="@+id/eightPinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="100dp"
+	    android:layout_marginTop="90dp"
+	    android:text="@string/EightSign" />
+    <Button
+	    android:id="@+id/ninePinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="200dp"
+	    android:layout_marginTop="90dp"
+	    android:text="@string/NineSign" />
+    
+    <Button
+	    android:id="@+id/fourPinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="0dp"
+	    android:layout_marginTop="160dp"
+	    android:text="@string/FourSign" />
+    <Button
+	    android:id="@+id/fivePinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="100dp"
+	    android:layout_marginTop="160dp"
+	    android:text="@string/FiveSign" />
+    <Button
+	    android:id="@+id/sixPinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="200dp"
+	    android:layout_marginTop="160dp"
+	    android:text="@string/SixSign" />
+    
+    <Button
+	    android:id="@+id/onePinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="0dp"
+	    android:layout_marginTop="230dp"
+	    android:text="@string/OneSign" />
+    <Button
+	    android:id="@+id/twoPinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="100dp"
+	    android:layout_marginTop="230dp"
+	    android:text="@string/TwoSign" />
+    <Button
+	    android:id="@+id/threePinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="200dp"
+	    android:layout_marginTop="230dp"
+	    android:text="@string/ThreeSign" />
+  
+    <Button
+	    android:id="@+id/zeroPinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="100dp"
+	    android:layout_marginTop="300dp"
+	    android:text="@string/ZeroSign" />
+    
+    <Button
+	    android:id="@+id/deletePinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="0dp"
+	    android:layout_marginTop="300dp"
+	    android:text="@string/DeleteSign" />
+    <Button
+	    android:id="@+id/cancelPinButton"
+	    android:layout_width="80dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="95dp"
+	    android:layout_marginTop="370dp"
+	    android:text="@string/CancelLabel" />
+    <Button
+	    android:id="@+id/okPinButton"
+	    android:layout_width="70dp"
+	    android:layout_height="50dp"
+	    android:layout_alignLeft="@+id/claimedShortCharge"
+	    android:layout_alignTop="@+id/claimedShortCharge"
+	    android:layout_marginLeft="200dp"
+	    android:layout_marginTop="300dp"
+	    android:text="@string/OkLabel" />
+    
+</RelativeLayout>
