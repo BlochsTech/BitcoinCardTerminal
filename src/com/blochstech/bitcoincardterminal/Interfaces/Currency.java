@@ -25,7 +25,7 @@ public enum Currency {
 			case 1:
 				return "apples";
 			case 2:
-				return "yuan";
+				return "yuans";
 			case 3:
 				return "dollars";
 			case 4:
@@ -54,7 +54,8 @@ public enum Currency {
 				return "Æ";
 		}
 	}
-	public Double Value(){ //TODO: Move to model as an interface object cannot access the internet...
+	
+	/*public Double Value(){ //TODO: Move to model as an interface object cannot access the internet...
 		//Currency value in apples they can buy with apples at 0.36 2014 dollars.
 		//Fiat assumed to decrease 90% in  20 years and bitcoin to reach M2 - 21 million 2014 dollars.
 		//Even without crypto currency disturbing things, fiat has declined 99% the past 100 years.
@@ -91,5 +92,5 @@ public enum Currency {
 			default:
 				return appleValue;
 		}
-	}
+	}*/
 }

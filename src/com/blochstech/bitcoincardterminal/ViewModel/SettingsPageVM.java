@@ -1,6 +1,7 @@
 package com.blochstech.bitcoincardterminal.ViewModel;
 
 import com.blochstech.bitcoincardterminal.Model.Model;
+import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Model.Communication.TypeConverter;
 import com.blochstech.bitcoincardterminal.Utils.Event;
 import com.blochstech.bitcoincardterminal.Utils.RegexUtil;
@@ -21,7 +22,7 @@ public class SettingsPageVM {
 		feeDollarValue = Model.Instance().getFee();
 		
 		currency = Model.Instance().getCurrency();
-		fee = feeDollarValue / ChosenCurrency().Value();
+		fee = feeDollarValue / CurrencyApiConnector.DollarValue(ChosenCurrency());
 		
 		courtesyOK = Model.Instance().getCourtesyOK();
 	}
@@ -53,7 +54,7 @@ public class SettingsPageVM {
 		if(RegexUtil.isMatch(value, RegexUtil.CommonPatterns.DECIMAL))
 		{
 			fee = Math.min(Double.parseDouble(value), 10000.0);
-			feeDollarValue = fee * ChosenCurrency().Value();
+			feeDollarValue = fee * CurrencyApiConnector.DollarValue(ChosenCurrency());
 			Model.Instance().setFee(feeDollarValue);
 		}
 		UpdateEvent.fire(this, null);
@@ -67,7 +68,8 @@ public class SettingsPageVM {
 		currency = value;
 		Model.Instance().setCurrency(currency);
 		
-		fee = feeDollarValue / value.Value();
+		
+		fee = feeDollarValue / CurrencyApiConnector.DollarValue(value);
 		
 		UpdateEvent.fire(this, null);
 	}

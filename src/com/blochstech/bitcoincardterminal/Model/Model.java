@@ -6,6 +6,7 @@ import com.blochstech.bitcoincardterminal.DataLayer.DAL;
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
 import com.blochstech.bitcoincardterminal.Interfaces.IModel;
 import com.blochstech.bitcoincardterminal.Interfaces.Message;
+import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Utils.Event;
 import com.blochstech.bitcoincardterminal.Utils.EventListener;
 
@@ -72,8 +73,8 @@ public class Model implements IModel{
 	}
 	
 	@Override
-	public boolean setFee(Double fee) {
-		return paymentModel.setFee(fee);
+	public boolean setFee(Double feeDollarValue) {
+		return paymentModel.setFee(feeDollarValue);
 	}
 	@Override
 	public Double getFee() {
@@ -101,7 +102,7 @@ public class Model implements IModel{
 	@Override
 	public void setPrice(Double value) {
 		paymentModel.setPrice(value);
-		cardModel.setCharge(value / Currency.Bitcoins.Value(), paymentModel.getFee() / Currency.Bitcoins.Value(), paymentModel.getAddress(), paymentModel.getCourtesyOK());
+		cardModel.setCharge(value / CurrencyApiConnector.DollarValue(Currency.Bitcoins), paymentModel.getFee() / CurrencyApiConnector.DollarValue(Currency.Bitcoins), paymentModel.getAddress(), paymentModel.getCourtesyOK());
 	}
 	@Override
 	public Double getPrice() {

@@ -120,6 +120,7 @@ public class BitcoinCard extends NFCWrapper {
 					connectDebug = false;
 					state.commandInProgress = BitcoinCallbackMethods.Debug;
 					super.newTask(CardTaskUtil.getDebugTask());
+					//super.newTask(CardTaskUtil.getReadEepromTask()); Fails as it should with "InvalidState"
 				}else if(state.cardNetworkType != 0){
 					state.commandInProgress = BitcoinCallbackMethods.Network;
 					super.newTask(CardTaskUtil.getNetworkTask());

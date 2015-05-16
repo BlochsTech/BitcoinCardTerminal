@@ -2,6 +2,7 @@ package com.blochstech.bitcoincardterminal.Model;
 
 import com.blochstech.bitcoincardterminal.DataLayer.DAL;
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
+import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 
 //State of address, fee, price and currency - loaded at startup.
 //Set price, convert, PIN, finish. 
@@ -10,9 +11,9 @@ class PaymentModel {
 	{
 		//Disk access only at pause and startup.
 		receivingAddress = DAL.Instance().getReceiveAddress();
-		feeDollarValue = Double.parseDouble(DAL.Instance().getFee());
-		courtesyOK = DAL.Instance().getCourtesyOK();
 		currency = Currency.Convert(DAL.Instance().getCurrency());
+		feeValue = Double.parseDouble(DAL.Instance().getFee());
+		courtesyOK = DAL.Instance().getCourtesyOK();
 		if(receivingAddress == null || receivingAddress.equals(""))
 			receivingAddress = "1AaJJCgqaebkQ7u7NahqG5dE65GPa8YTRB"; //Donation address of the Danish Bitcoin Foundation
 	}
@@ -20,13 +21,13 @@ class PaymentModel {
 	void persistData(){ //Call onPause via MainAcitvity and Model.
 		//Disk access only at pause and startup.
 		DAL.Instance().setReceiveAddress(receivingAddress);
-		DAL.Instance().setFee(feeDollarValue.toString());
+		DAL.Instance().setFee(feeValue.toString());
 		DAL.Instance().setCourtesyOK(courtesyOK);
 		DAL.Instance().setCurrency(currency.getValue());
 	}
 	
 	private String receivingAddress = "";
-	private Double feeDollarValue = 0.0;
+	private Double feeValue = 0.0;
 	private boolean courtesyOK = false;
 	private Currency currency = Currency.Apples;
 	
@@ -49,17 +50,13 @@ class PaymentModel {
 		return receivingAddress;
 	}
 	
-	boolean setFee(Double fee) {  //We expect fee as dollar value now. Above 0.40$ is not allowed.
-		if(fee <= 0.40){
-			feeDollarValue = fee;
-			Model.Instance().fireUpdate(feeDollarValue);
-			return true;
-		}else{
-			return false;
-		}
+	boolean setFee(Double feeDollarValue) {  //We expect fee as dollar value now.
+		feeValue = feeDollarValue / CurrencyApiConnector.DollarValue(currency);
+		Model.Instance().fireUpdate(feeDollarValue);
+		return true;
 	}
 	Double getFee() {
-		return feeDollarValue;
+		return feeValue*CurrencyApiConnector.DollarValue(currency);
 	}
 	
 	void setCourtesyOK(boolean courtesyOK) {
@@ -71,6 +68,7 @@ class PaymentModel {
 	}
 	
 	void setCurrency(Currency currency) {
+		feeValue = feeValue * CurrencyApiConnector.DollarValue(this.currency) / CurrencyApiConnector.DollarValue(currency);
 		this.currency = currency;
 		Model.Instance().fireUpdate(currency);
 	}

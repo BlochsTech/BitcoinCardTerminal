@@ -25,6 +25,13 @@ public class CardTaskUtil {
 			throw new Exception("Unexpected response length.");
 	}
 	
+	//This command should really really fail. -> It DOES! Yay. (with invalid state error)
+	public static byte[] getReadEepromTask(){
+		int[] ubytes = new int[]{192, 8 , 0, 0, 255};
+		
+		return ByteConversionUtil.fromUnsigned(ubytes);
+	}
+	
 	public static byte[] getNetworkTask(){
 		int[] ubytes = new int[]{CLA, 0, 0, 0, 2, 0, 0, 2}; //Equals x80 x00 x00 x00 x02 x00 x00 x02
 		

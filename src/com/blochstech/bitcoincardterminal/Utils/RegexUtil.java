@@ -11,7 +11,7 @@ public class RegexUtil {
 		//33 long, no 0, i, o or L:
 		//public static final String BITCOIN_ADDRESS = "(\\A|^)[13]{1}[1-9A-HJ-NP-Za-km-z]{33}(\\Z|$)"; Not technically correct, use validator function.
 		//public static final String BITCOIN_ADDRESS_CHARS = "(\\A|^)[1-9A-HJ-NP-Za-km-z]{0,34}(\\Z|$)";
-		public static final String DECIMAL = "(\\A|^)[0-9]+(\\.{1}[0-9]*){0,1}(\\Z|$)";
+		public static final String DECIMAL = "(\\A|^)[0-9]+([\\.,]{1}[0-9]*){0,1}(\\Z|$)";
 		public static final String BYTEHEX = "(\\A|^)([0-9a-fA-F]{2})*(\\Z|$)";
 		public static final String BASE58_CHARS = "(\\A|^)[1-9A-HJ-NP-Za-km-z]*(\\Z|$)";
 	}
@@ -74,6 +74,14 @@ public class RegexUtil {
 			Log.e(Tags.APP_TAG, "Regex getMatches error: " + ex.toString());
 			return new LinkedList<Match>();
 		}
+    }
+    
+    public static String getMatch(String input, String pattern){
+    	LinkedList<Match> matches = getMatches(input,pattern);
+    	if(matches != null && matches.size() > 0){
+    		return matches.get(0).value;
+    	}
+    	return null;
     }
     
     public static int getIndex(String input, String pattern){

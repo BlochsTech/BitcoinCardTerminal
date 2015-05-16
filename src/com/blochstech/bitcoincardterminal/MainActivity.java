@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.blochstech.bitcoincardterminal.Model.Model;
+import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.View.MainPage;
 import com.blochstech.bitcoincardterminal.View.PageTags;
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.MessageManager;
@@ -51,6 +52,7 @@ public class MainActivity extends FragmentActivity {
 		}
         
         ListenForNFCIntent();
+        CurrencyApiConnector.SynchPrices("MainInit");
         
         MessageManager.Instance().AddMessage("Init " + Calendar.getInstance().getTime().toString(), false);
         

@@ -7,10 +7,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
+
 import android.os.Environment;
+import android.util.Log;
 
 import com.blochstech.bitcoincardterminal.Utils.ResourceHolder;
 import com.blochstech.bitcoincardterminal.Utils.SyntacticSugar;
+import com.blochstech.bitcoincardterminal.Utils.Tags;
 
 public class GenericFileCache<T>{
 	private static HashMap<String, ResourceHolder> pathsInUse = new HashMap<String, ResourceHolder>();
@@ -49,12 +52,13 @@ public class GenericFileCache<T>{
 		return;
 	}
 	
-	public synchronized void Close(Object holder) throws Exception{
+	public synchronized void Close(Object holder){ //TODO: Find all usages and make sure they are called even if exception happens.
 		if(isHolder(holder)){
 			pathsInUse.remove(FileCachePath);
 			this.notifyAll();
 		}else{
-			throw new Exception("A non-lock holder tried to close the generic cache. Path: " + FileCachePath);
+			if(Tags.DEBUG)
+				Log.e(Tags.APP_TAG, "A non-lock holder tried to close the generic cache. Path: " + FileCachePath);
 		}
 	}
 	

@@ -129,6 +129,7 @@ class NetworkConnector {
 					Log.e(Tags.APP_TAG, "TxCache was null.");
 			}
 		} catch (Exception e) {
+			txCache.Close(this);
 			if(Tags.DEBUG)
 				Log.e(Tags.APP_TAG, "NetworkConnector could not open txCache. " + e.getMessage());
 		}
@@ -319,6 +320,7 @@ class NetworkConnector {
 							}
 							
 						} catch (Exception e) {
+							txCache.Close(this);
 							if(Tags.DEBUG)
 								Log.e(Tags.APP_TAG, "NetworkConnector could not open txCache. " + e.getMessage());
 						}

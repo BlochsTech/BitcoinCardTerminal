@@ -1,7 +1,10 @@
 package com.blochstech.bitcoincardterminal.View;
 
+import java.text.DecimalFormat;
+
 import com.blochstech.bitcoincardterminal.R;
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
+import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Utils.EventListener;
 import com.blochstech.bitcoincardterminal.Utils.SyntacticSugar;
 import com.blochstech.bitcoincardterminal.ViewModel.SettingsPageVM;
@@ -122,11 +125,14 @@ public class SettingsPage extends Fragment {
 	        	feeBox.setText(String.format("%.2f",myVM.Fee())); //Means precision = 7 and floating point to decimal conversion.
 	        	
 				selectButton(myVM.ChosenCurrency());
+				
+				DecimalFormat df = new DecimalFormat("0.#######");
+				
 				currencyText.setText("('"
 						+myVM.ChosenCurrency().Description()
 						+"' --> 1"
 						+myVM.ChosenCurrency().Symbol()+" ~ "
-						+String.format("%.7s",myVM.ChosenCurrency().Value())+"$)");
+						+df.format(CurrencyApiConnector.DollarValue(myVM.ChosenCurrency()))+"$)");
 	        	feeCurrencyText.setText(myVM.ChosenCurrency().Symbol());
 				
 	        	courtesyOK.setChecked(myVM.CourtesyOK());

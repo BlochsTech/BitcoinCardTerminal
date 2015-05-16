@@ -2,6 +2,7 @@ package com.blochstech.bitcoincardterminal.ViewModel;
 
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
 import com.blochstech.bitcoincardterminal.Model.Model;
+import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Utils.Event;
 import com.blochstech.bitcoincardterminal.Utils.EventListener;
 import com.blochstech.bitcoincardterminal.Utils.RegexUtil;
@@ -23,7 +24,7 @@ public class ChargePageVM {
 	{
 		currency = Model.Instance().getCurrency();
 		priceDollarValue = Model.Instance().getPrice();
-		price = priceDollarValue / Currency().Value();
+		price = priceDollarValue / CurrencyApiConnector.DollarValue(Currency());
 	}
 	
 	private Double price = 0.0;
@@ -31,8 +32,9 @@ public class ChargePageVM {
 	public void Price(String value){
 		if(RegexUtil.isMatch(value, RegexUtil.CommonPatterns.DECIMAL))
 		{
-			price = Math.min(Double.parseDouble(value), 10000.0);
-			priceDollarValue = price * Model.Instance().getCurrency().Value();
+			String cleanValue = value.replace(",", ".");
+			price = Math.min(Double.parseDouble(cleanValue), 10000.0);
+			priceDollarValue = price * CurrencyApiConnector.DollarValue(Model.Instance().getCurrency());
 		}
 		UpdateEvent.fire(fireKey, null);
 	}
@@ -59,7 +61,7 @@ public class ChargePageVM {
 				
 				if(event instanceof Currency){
 					currency = Model.Instance().getCurrency();
-					price = priceDollarValue / Currency().Value();
+					price = priceDollarValue / CurrencyApiConnector.DollarValue(Currency());
 					UpdateEvent.fire(fireKey, null);
 				}
 			}catch (Exception ex){

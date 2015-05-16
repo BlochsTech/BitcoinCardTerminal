@@ -2,6 +2,7 @@ package com.blochstech.bitcoincardterminal.ViewModel;
 
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
 import com.blochstech.bitcoincardterminal.Model.Model;
+import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Utils.Event;
 import com.blochstech.bitcoincardterminal.Utils.EventListener;
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.MessageManager;
@@ -21,7 +22,7 @@ public class PinPageVM {
 	public void stateUpdate(){
 		currency = Model.Instance().getCurrency();
 		fullPriceDollarValue = Model.Instance().getPrice() + Model.Instance().getFee();
-		fullPrice = fullPriceDollarValue / currency.Value();
+		fullPrice = fullPriceDollarValue / CurrencyApiConnector.DollarValue(currency);
 		courtesyOk = Model.Instance().getCourtesyOK();
 		cardMessage = Model.Instance().getCardMessage();
 		cardPrice = Model.Instance().getVignereCode();
@@ -59,7 +60,7 @@ public class PinPageVM {
 		return fullPrice;
 	}
 	public Double BitcoinPrice(){
-		return fullPriceDollarValue / Currency.Bitcoins.Value();
+		return fullPriceDollarValue / CurrencyApiConnector.DollarValue(Currency.Bitcoins);
 	}
 	
 	private String cardPrice = "";

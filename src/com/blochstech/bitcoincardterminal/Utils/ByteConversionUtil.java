@@ -214,6 +214,37 @@ public class ByteConversionUtil {
 		return result;
 	}
 	
+	public static Double[] toArray(LinkedList<Double> list){
+		Double[] result = new Double[list.size()];
+		for(int i = 0; i < result.length; i++){
+			result[i] = list.get(i);
+		}
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T,R> R safeAssign(T value, R defaultValue, T disAllow){
+		try{
+			if(value != null || value == disAllow)
+				return (R)value;
+		}catch(Exception ex){}
+		
+		return defaultValue;
+	}
+	
+	public static <T,R> R safeAssign(T value, R defaultValue){
+		return safeAssign(value, defaultValue, null);
+	}
+	
+	public static <T> LinkedList<T> toList(T[] array){
+		
+		LinkedList<T> result = new LinkedList<T>();
+		for(int i = 0; i < array.length; i++){
+			result.add(array[i]);
+		}
+		return result;
+	}
+	
 	public static byte[] toSimpleBytes(LinkedList<Byte> listBytes){
 		byte[] result = new byte[listBytes.size()];
 		for(int i = 0; i < result.length; i++){

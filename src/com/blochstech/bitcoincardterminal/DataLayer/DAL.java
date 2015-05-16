@@ -23,7 +23,7 @@ public class DAL implements IDAL {
 		try {
 			messageEvent = new Event<Message>(this);
 			addressCache = new GenericFileCache<String>(addressCachePath, "");
-			feeCache = new GenericFileCache<String>(feeCachePath, "0");
+			feeCache = new GenericFileCache<String>(feeCachePath, "0.01");
 			courtesyOKCache = new GenericFileCache<Boolean>(courtesyOKCachePath, false);
 			currencyCache = new GenericFileCache<Integer>(currencyCachePath, 1);
 		} catch (Exception e) {
