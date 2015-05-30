@@ -53,7 +53,8 @@ public class SettingsPageVM {
 	public void Fee(String value){
 		if(RegexUtil.isMatch(value, RegexUtil.CommonPatterns.DECIMAL))
 		{
-			fee = Math.min(Double.parseDouble(value), 10000.0);
+			String cleanValue = value.replace(",", ".");
+			fee = Math.min(Double.parseDouble(cleanValue), 10000.0);
 			feeDollarValue = fee * CurrencyApiConnector.DollarValue(ChosenCurrency());
 			Model.Instance().setFee(feeDollarValue);
 		}

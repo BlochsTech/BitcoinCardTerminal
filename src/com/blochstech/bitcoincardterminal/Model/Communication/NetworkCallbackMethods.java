@@ -2,7 +2,8 @@ package com.blochstech.bitcoincardterminal.Model.Communication;
 
 public enum NetworkCallbackMethods {
 		TXData(0), //TXData ready.
-		NoConnection(1); //HTML error.
+		NoConnection(1), //HTML error.
+		TXSendResult(2);
 		
 		private int value;
 		public int Value(){

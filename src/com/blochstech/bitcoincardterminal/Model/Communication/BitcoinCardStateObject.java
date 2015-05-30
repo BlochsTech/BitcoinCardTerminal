@@ -26,7 +26,7 @@ class BitcoinCardStateObject {
 	int requiresPin = 0; //-1 for no, 0 for undetermined and 1 for true.
 	LinkedList<Byte> paymentTxBytes = new LinkedList<Byte>();
 	boolean claimIsDEREncoded;
-	boolean paymentComplete;
+	int paymentComplete; //0 not set/used. 1 Ok. -1 error.
 	
 	//SPECIFIC CARD STATE (will clear on connect):
 	//This data may change in the actual card and should be checked/updated at certain points.
@@ -195,7 +195,8 @@ class BitcoinCardStateObject {
 		
 		long totalSatoshis = 0;
 		for(int i = 0; i < knownSources.size(); i++){
-			totalSatoshis = totalSatoshis + knownSources.get(i).Satoshi;
+			if(knownSources.get(i).Unusable == false && knownSources.get(i).Verified == true)
+				totalSatoshis = totalSatoshis + knownSources.get(i).Satoshi;
 		}
 		return totalSatoshis;
 	}
@@ -245,8 +246,8 @@ class BitcoinCardStateObject {
 		if(!isConnected || cardNetworkType != 0 || cardProtocolType != 0)
 			return "No card.";
 		
-		if (paymentComplete){
-			return "Payment complete.";
+		if (paymentComplete != 0){
+			return paymentComplete == 1 ? "Payment complete." : "Error";
 		}
 		
 		if(maxCardCharge != null && totalChargeAsBitcoin() != null && maxCardCharge < totalChargeAsBitcoin())
@@ -279,7 +280,7 @@ class BitcoinCardStateObject {
 		pinCode = -1;
 		paymentTxBytes = new LinkedList<Byte>();
 		claimIsDEREncoded = false;
-		paymentComplete = false;
+		paymentComplete = 0;
 		
 		cardNetworkType = -1;
 		cardProtocolType = -1;

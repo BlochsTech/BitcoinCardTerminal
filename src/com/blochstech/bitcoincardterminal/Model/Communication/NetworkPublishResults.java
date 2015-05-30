@@ -1,18 +1,33 @@
 package com.blochstech.bitcoincardterminal.Model.Communication;
 
-public enum NetworkPublishResults{
-	OK(0), //Remove from send queue, payment complete.
-	Retry(1), //Try again sending later.
-	Invalid(2);
+public class NetworkPublishResults{
+	public SendStatus Status;
+	public String Message;
 	
-	private int value;
-	public int Value(){
-		return value;
+	public NetworkPublishResults(){
+		Status = SendStatus.OK;
+		Message = "";
 	}
-	private NetworkPublishResults(int value) {
-	  this.value = value;
+	
+	public NetworkPublishResults(SendStatus status, String message){
+		Status = status;
+		Message = message;
 	}
-	public static NetworkPublishResults Convert(int value){
-		return NetworkPublishResults.values()[value];
+	
+	public enum SendStatus{
+		OK(0), //Remove from send queue, payment complete.
+		Retry(1), //Try again sending later.
+		Invalid(2);
+		
+		private int value;
+		public int Value(){
+			return value;
+		}
+		private SendStatus(int value) {
+		  this.value = value;
+		}
+		public static SendStatus Convert(int value){
+			return SendStatus.values()[value];
+		}
 	}
 }

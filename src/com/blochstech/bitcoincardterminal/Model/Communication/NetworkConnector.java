@@ -216,7 +216,6 @@ class NetworkConnector {
 		    	Enter();
 		    		workerThreadReference = Thread.currentThread();
 			    	
-		    		
 		    		//Getting sources:
 		    		if(state.waitingForCardData()){
 		    			try{
@@ -235,6 +234,7 @@ class NetworkConnector {
 		    				
 		    				if(state.txHash != null){
 		    					objArray = getTX();
+		    					
 		    					if(objArray.SecondValue != null){
 			    					state.txJSON = (JSONObject) objArray.SecondValue[0];
 			    					state.txRaw = (byte[]) objArray.SecondValue[1];
@@ -301,19 +301,23 @@ class NetworkConnector {
 		    		if(txCache != null){
 		    			try {
 		    				String txHex = null;
-		    				NetworkPublishResults res = NetworkPublishResults.OK;
+		    				NetworkPublishResults res = new NetworkPublishResults();
 							
 		    				txCache.Open(this);
 		    				LinkedList<String> txQueue = txCache.get(this);
 							if(txQueue.size() > 0){
 								txHex = txQueue.remove();
 								res = sendTransaction(txHex);
-								if(res != NetworkPublishResults.Retry)
+
+								publishProgress(new EventUpdate(new Callback(NetworkCallbackMethods.TXSendResult.Value(), new Object[]{res.Status, 
+										res.Message})));
+								
+								if(res.Status != NetworkPublishResults.SendStatus.Retry)
 									txCache.set(this, txQueue); //Only update queue, with head item now removed, if tx sent.
 							}
 							txCache.Close(this);
 							
-							if(res == NetworkPublishResults.Invalid){
+							if(res.Status == NetworkPublishResults.SendStatus.Invalid){
 								if(Tags.DEBUG)
 									Log.e(Tags.APP_TAG, "Published Tx was invalid, this issue will not be handled further in this"
 										+ " version of the terminal program.");
@@ -366,9 +370,7 @@ class NetworkConnector {
 			try{
 				postRequest.setEntity(new UrlEncodedFormEntity(nameValuePair));
 			}catch(Exception ex){
-				if(Tags.DEBUG)
-					Log.e(Tags.APP_TAG, "Failed to encode TX post. " + ex.getMessage());
-				return NetworkPublishResults.Invalid;
+				return new NetworkPublishResults(NetworkPublishResults.SendStatus.Invalid, "Failed to encode TX post. " + ex.getMessage());
 			}
 			
 			response = client.execute(postRequest);
@@ -381,10 +383,8 @@ class NetworkConnector {
 				   + response.getStatusLine().getStatusCode());
 				failed = true;
 			}else if(response.getStatusLine().getStatusCode() == 522){ //Server busy
-				if(Tags.DEBUG)
-					Log.i(Tags.APP_TAG, "Server busy, will retry. "
+				return new NetworkPublishResults(NetworkPublishResults.SendStatus.Retry, "Server busy, will retry. "
 						   + response.getStatusLine().getStatusCode());
-				return NetworkPublishResults.Retry;
 			}
 			
 			br = new BufferedReader(
@@ -400,9 +400,7 @@ class NetworkConnector {
 			tempStr = tempStr == null ? "" : tempStr;
 			
 			if(failed){
-				if(Tags.DEBUG)
-					Log.e(Tags.APP_TAG, "API error: " + tempStr);
-				return NetworkPublishResults.Invalid;
+				return new NetworkPublishResults(NetworkPublishResults.SendStatus.Invalid, "API error: " + tempStr);
 			}else{
 				if(Tags.DEBUG)
 					Log.i(Tags.APP_TAG, "API: " + tempStr);
@@ -410,7 +408,7 @@ class NetworkConnector {
 			
 			state.newCardClear(); //Clear all data that may have been used/no longer valid.
 			
-			return NetworkPublishResults.OK;
+			return new NetworkPublishResults(NetworkPublishResults.SendStatus.OK, null);
 		}
 		
 		private SimpleTuple<Boolean,String[]> getTXIds() throws Exception{

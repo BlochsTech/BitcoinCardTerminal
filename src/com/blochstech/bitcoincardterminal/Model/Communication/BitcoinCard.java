@@ -10,7 +10,9 @@ import com.blochstech.bitcoincardterminal.Interfaces.Message.MessageType;
 import com.blochstech.bitcoincardterminal.Utils.ByteConversionUtil;
 import com.blochstech.bitcoincardterminal.Utils.Event;
 import com.blochstech.bitcoincardterminal.Utils.EventListener;
+import com.blochstech.bitcoincardterminal.Utils.SyntacticSugar;
 import com.blochstech.bitcoincardterminal.Model.Communication.NetworkCallbackMethods;
+import com.blochstech.bitcoincardterminal.Model.Communication.NetworkPublishResults.SendStatus;
 
 //Extends and uses a class that has its own worker thread, however this class runs on the main UIThread.
 //Only different thing is that it will take updates and asynchronously give the responses.
@@ -470,10 +472,14 @@ public class BitcoinCard extends NFCWrapper {
 								String tmpRes = ByteConversionUtil.byteArrayToHexString(ByteConversionUtil.toBytes(state.paymentTxBytes));
 								tmpRes = tmpRes + "";
 								
-								networkConnector.publishTX(state.paymentTxBytes);
+								if(!state.waitingIsResetRequest && tmpRes != null && tmpRes.length() > 0){
+									networkConnector.publishTX(state.paymentTxBytes);
+								}else if (state.waitingIsResetRequest){
+									messageEvent.fire(fireKey, new Message("Attempted to publish empty TX.", MessageType.Error)); //TODO: Make sure this never happens.
+								}
 								//TODO: Coomunicate sent TXes to History model/harddisk, for now just straight to the NetworkConnector.
 								
-								state.paymentComplete = !state.waitingIsResetRequest;
+								//state.paymentComplete = !state.waitingIsResetRequest;
 								state.waitingIsResetRequest = false;
 								state.pinCode = -1;
 								cardMessage = state.updateCardMessageFromState();
@@ -560,15 +566,24 @@ public class BitcoinCard extends NFCWrapper {
 					
 					if(event.MethodId == NetworkCallbackMethods.TXData.Value()){
 						if(event.Response != null){
-							state.blockHeader = (byte[]) event.Response[0];
-							state.merkleBranch = (MerkleBranchElement[]) event.Response[1];
-							state.setTXRaw((byte[]) event.Response[2]);
-							state.txSource = new TXSourceId();
-							state.txSource.TXHash = (String) event.Response[3];
-							state.waitingForNetwork = false;
-							cardMessage = state.updateCardMessageFromState(); //Was full previous logic.
-							callbackEvent.fire(fireKey, new Callback(-1));
-							processStateChange();
+							if(((byte[])event.Response[2]).length > 2000){
+								TXSourceId val = new TXSourceId();
+								val.TXHash = (String) event.Response[3];
+								val.Unusable = true;
+								state.addKnownSource(val);
+								networkConnector.getUnspentTXs(state.addresses, state.getKnownSources()); //Runs on its own thread.
+								state.waitingForNetwork = true;
+							}else{
+								state.blockHeader = (byte[]) event.Response[0];
+								state.merkleBranch = (MerkleBranchElement[]) event.Response[1];
+								state.setTXRaw((byte[]) event.Response[2]);
+								state.txSource = new TXSourceId();
+								state.txSource.TXHash = (String) event.Response[3];
+								state.waitingForNetwork = false;
+								cardMessage = state.updateCardMessageFromState(); //Was full previous logic.
+								callbackEvent.fire(fireKey, new Callback(-1));
+								processStateChange();
+							}
 						}else{
 							state.waitingForNetwork = false;
 							state.noMoreUnknownSources = true;
@@ -586,6 +601,18 @@ public class BitcoinCard extends NFCWrapper {
 						cardMessage = "No network."; //Was "No network."
 						callbackEvent.fire(fireKey, new Callback(-1));
 						processStateChange(); //Does what can be done or exits process until new card connect.
+					}else if(event.MethodId == NetworkCallbackMethods.TXSendResult.Value()){
+						NetworkPublishResults.SendStatus status = SyntacticSugar.castAs(event.Response[0]); //TX accepted by Api.
+						String message = SyntacticSugar.castAs(event.Response[1]); //Error in case of error.
+						
+						state.paymentComplete = status == SendStatus.Retry ? 0 
+								: status == SendStatus.OK ? 1 : -1;
+						state.updateCardMessageFromState();
+						
+						if(status == SendStatus.Invalid)
+							messageEvent.fire(fireKey, new Message("Failed to send TX. Error: " + message, MessageType.Error));
+						if(status == SendStatus.Retry)
+							messageEvent.fire(fireKey, new Message("Failed to send TX. Warning: " + message, MessageType.Warning));
 					}else{
 						messageEvent.fire(fireKey, new Message("Unrecognized callback: " + event.MethodId, MessageType.Error));
 					}
