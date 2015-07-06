@@ -38,4 +38,6 @@ public interface IModel {
 	public String getVignereCode();
 	
 	public boolean getPinRequired();
+
+	public String getCardAddress();
 }

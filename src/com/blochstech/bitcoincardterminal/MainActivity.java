@@ -7,6 +7,7 @@ import android.nfc.Tag;
 import android.nfc.tech.NfcA;
 import android.os.Bundle;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.app.FragmentActivity;
@@ -29,9 +30,19 @@ public class MainActivity extends FragmentActivity {
 	private PendingIntent mPendingIntent;
 	private String[][] techListsArray;
 	
+	public static MainActivity instance;
+	
+	public static Context GetMainContext(){
+		Context res = instance != null ? instance.getApplicationContext() : null;
+		return res;
+	}
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        if(instance == null)
+        	instance = this;
         
         setContentView(R.layout.fragment_placeholder);
         if (findViewById(R.id.reuseablePlaceholder) != null) {

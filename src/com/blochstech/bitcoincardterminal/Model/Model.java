@@ -25,7 +25,7 @@ public class Model implements IModel{
 	private Model()
 	{
 		messageEvent = new Event<Message>(fireKey);
-		updateEvent = new Event<Object>(fireKey, 2);
+		updateEvent = new Event<Object>(fireKey, 3); //PinPageVM, ChargePageVM and SettingsPageVM
 		DAL.Instance().MessageEventReference().register(messageListener);
 		paymentModel = new PaymentModel();
 		cardModel = new CardModel();
@@ -127,6 +127,11 @@ public class Model implements IModel{
 	@Override
 	public boolean getPinRequired() {
 		return cardModel.getPinRequired();
+	}
+	
+	@Override
+	public String getCardAddress() {
+		return cardModel.getCardAddress();
 	}
 	
 	@Override

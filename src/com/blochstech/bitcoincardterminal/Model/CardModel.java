@@ -54,6 +54,11 @@ class CardModel {
 	boolean getPinRequired(){
 		return pinRequired;
 	}
+	
+	private String cardAddress = null;
+	String getCardAddress(){
+		return cardAddress;
+	}
 
 	void setCard(Tag tag) {
 		card.setTag(tag);
@@ -79,6 +84,7 @@ class CardModel {
 			vignereCode = card.VignereCode();
 			pinRequired = card.PinRequired();
 			shortCharge = card.ShortCharge();
+			cardAddress = card.CardAddress();
 			Model.Instance().fireUpdate(cardMessage);
 		}
     }

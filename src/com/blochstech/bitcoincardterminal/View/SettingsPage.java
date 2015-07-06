@@ -2,6 +2,7 @@ package com.blochstech.bitcoincardterminal.View;
 
 import java.text.DecimalFormat;
 
+import com.blochstech.bitcoincardterminal.MainActivity;
 import com.blochstech.bitcoincardterminal.R;
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
 import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
@@ -12,6 +13,7 @@ import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.MessageMan
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.NavigationManager;
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.PageManager;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -44,6 +46,7 @@ public class SettingsPage extends Fragment {
 	
 	private OnClickListener btnListener = new ButtonListener();
 	private TextListener textListener = new TextListener();
+	private TextClickListener textClickListener = new TextClickListener();
 	
 	private boolean initialized = false;
 	
@@ -63,6 +66,7 @@ public class SettingsPage extends Fragment {
     	
     	//Save views for faster access:
     	addressBox = new EasyText(SyntacticSugar.<EditText>castAs(myView.findViewById(R.id.addressText)));
+    	SetUseType(false);
     	feeBox = new EasyText(SyntacticSugar.<EditText>castAs(myView.findViewById(R.id.feeText)));
     	courtesyOK = SyntacticSugar.<CheckBox>castAs(myView.findViewById(R.id.courtesyCheckBox));
     	btcButton = SyntacticSugar.<Button>castAs(myView.findViewById(R.id.btcButton));
@@ -85,6 +89,7 @@ public class SettingsPage extends Fragment {
     	okButton.setOnClickListener(btnListener);
     	courtesyOK.setOnClickListener(btnListener);
     	addressBox.updateEvent.register(textListener);
+    	addressBox.clickEvent.register(textClickListener);
     	feeBox.updateEvent.register(textListener);
     	
     	initialized = true;
@@ -142,6 +147,87 @@ public class SettingsPage extends Fragment {
     	}
     }
     
+    private boolean usingTyping = false;
+    private void SetUseType(boolean value, int type){
+    	if(!value)
+    	{
+    		usingTyping = false;
+    		myVM.UseNFC(false);
+    		return;
+    	}
+    	
+    	switch(type)
+    	{
+    		case 0:
+		    	usingTyping = true;
+	    		myVM.UseNFC(false);
+		    	//addressBox.ViewReference().setFocusable(value);
+		    	break;
+    		case 1:
+    			usingTyping = false;
+        		myVM.UseNFC(true);
+    			break;
+			default:
+				break;
+    	}
+    }
+    private void SetUseType(boolean value){
+    	SetUseType(value, 0);
+    }
+    
+    private void focusAddressField(){
+    	try{
+			//addressBox.ViewReference().requestFocus();
+			//InputMethodManager imm = (InputMethodManager) MainActivity.instance.getSystemService(Context.INPUT_METHOD_SERVICE);
+			//imm.showSoftInput(addressBox.ViewReference(), InputMethodManager.SHOW_IMPLICIT);
+			//MainActivity.instance.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+			  
+			//TODO: Make this work.
+			//InputMethodManager imm = (InputMethodManager)getSystemService(
+			//      Context.INPUT_METHOD_SERVICE);
+			//imm.hideSoftInputFromWindow(myEditText.getWindowToken(), 0);
+    	}catch(Exception ex){
+    		MessageManager.Instance().AddMessage(ex.toString(), true);
+    	}
+    }
+    
+    private Dialog dialog = null;
+    private void showAddressDialog(){
+    	//set up dialog
+    	if(dialog == null)
+    	{
+	        dialog = new Dialog(MainActivity.instance); //TODO: Clean that a bit...
+	        dialog.setContentView(R.layout.addressloaddialog);
+	        dialog.setTitle("How do you want to input the address?");
+	        dialog.setCancelable(true);
+	        //there are a lot of settings, for dialog, check them all out!
+
+	        //Set up type button:
+	        Button typeButton = (Button) dialog.findViewById(R.id.TypeChoiceButton);
+	        typeButton.setOnClickListener(new OnClickListener() {
+	        	@Override
+	            public void onClick(View v) {
+		        	dialog.hide();
+
+		        	SetUseType(true);
+		        	focusAddressField();
+	            }
+	        });
+	        
+	        Button nfcButton = (Button) dialog.findViewById(R.id.NFCChoiceButton);
+	        nfcButton.setOnClickListener(new OnClickListener() {
+	        	@Override
+	            public void onClick(View v) {
+		        	dialog.hide();
+	        		SetUseType(true, 1);
+	            }
+	        });
+    	}
+        
+        //now that the dialog is set up, it's time to show it    
+        dialog.show();
+    }
+    
 	private void selectButton(Currency currency){
     	btcButton.setEnabled(currency != Currency.MicroBitcoins);
     	appleButton.setEnabled(currency != Currency.Apples);
@@ -169,6 +255,7 @@ public class SettingsPage extends Fragment {
 		@Override
 		public void onClick(View v) { //Select logic by btn id:
 			try{
+				SetUseType(false);
 				switch(v.getId())
 				{
 					case R.id.courtesyCheckBox:
@@ -212,6 +299,7 @@ public class SettingsPage extends Fragment {
 						break;
 					case R.id.feeText:
 						myVM.Fee(feeBox.getText().toString());
+						SetUseType(false);
 						break;
 					default:
 						MessageManager.Instance().AddMessage("Text change event Id not found.", true);
@@ -220,6 +308,14 @@ public class SettingsPage extends Fragment {
 			}catch (Exception ex){
 	    		MessageManager.Instance().AddMessage(ex.toString(), true);
 	    	}
+		}
+    }
+    
+    private class TextClickListener extends EventListener<Boolean>{
+		@Override
+		public void onEvent(Boolean event) {
+			if(!usingTyping)
+				showAddressDialog();
 		}
     }
     

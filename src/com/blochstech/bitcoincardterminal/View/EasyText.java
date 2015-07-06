@@ -7,11 +7,14 @@ import com.blochstech.bitcoincardterminal.Utils.Event;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.EditText;
 
 //Internal, view only.
 class EasyText {
 	private TextWatcher textListener = new TextListener();
+	private ClickListener clickListener = new ClickListener();
 	//private boolean watcherSet = false;
 	
 	private EditText myView;
@@ -20,11 +23,17 @@ class EasyText {
 	private static HashMap<String, Boolean> ignoreFlags = new HashMap<String, Boolean>();
 	
 	Event<Integer> updateEvent = new Event<Integer>(this);
+	Event<Boolean> clickEvent = new Event<Boolean>(this); //TODO:
 	
 	EasyText(EditText v){
 		myView = v;
 		myView.addTextChangedListener(textListener);
+		myView.setOnClickListener(clickListener);
     	setValid(true);
+	}
+	
+	View ViewReference(){
+		return myView;
 	}
 	
 	void ignoreTextChanges(boolean value){
@@ -79,6 +88,16 @@ class EasyText {
 			}else{
 				ignoreChangeEvent = false;
 			}
+		}
+    }
+    
+    private void fireClick(){
+    	clickEvent.fire(this, true);
+	}
+    private class ClickListener implements OnClickListener{
+		@Override
+		public void onClick(View arg0) {
+			fireClick();
 		}
     }
 }

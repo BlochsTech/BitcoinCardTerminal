@@ -48,6 +48,13 @@ public class BitcoinCard extends NFCWrapper {
 		return state.requiresPin > -1;
 	}
 	
+	public String CardAddress(){
+		if(state == null || state.addresses == null || state.addresses.size() < 1)
+			return null;
+		
+		return state.addresses.get(0);
+	}
+	
 	private boolean courtesyOk;
 	
 	//Setup and event accessing:
@@ -285,6 +292,8 @@ public class BitcoinCard extends NFCWrapper {
 					case Addresses:
 						ArrayList<String> addresses = CardTaskUtil.getAddressesResponse(value);
 						state.addresses = addresses;
+						
+						callbackEvent.fire(fireKey, new Callback(-1)); //Let settings page know if its waiting for NFC card address.
 						
 						state.commandInProgress = BitcoinCallbackMethods.None;
 						processStateChange();

@@ -4,15 +4,24 @@ import com.blochstech.bitcoincardterminal.Model.Model;
 import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Model.Communication.TypeConverter;
 import com.blochstech.bitcoincardterminal.Utils.Event;
+import com.blochstech.bitcoincardterminal.Utils.EventListener;
 import com.blochstech.bitcoincardterminal.Utils.RegexUtil;
+import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.MessageManager;
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
 
 //VM class, holds state of a 1-1 corresponding view class.
 //Is stored in PageManager.
 //VMs should handle input and expose update events to the View. VMs can also call the model layer or utils.
 public class SettingsPageVM {
+
+	private EventListener<Object> modelListener = new ModelListener();
+
+	public Event<Object> UpdateEvent;
+	private Object fireKey = new Object();
+	
 	public SettingsPageVM(){
-		UpdateEvent = new Event<Object>(this);
+		UpdateEvent = new Event<Object>(fireKey);
+		Model.Instance().updateEvent.register(modelListener);
 		
 		//Init:
 		address = Model.Instance().getAddress();
@@ -27,8 +36,6 @@ public class SettingsPageVM {
 		courtesyOK = Model.Instance().getCourtesyOK();
 	}
 	
-	public Event<Object> UpdateEvent;
-	
 	private String address = "";
 	public String Address(){
 		return address;
@@ -42,7 +49,18 @@ public class SettingsPageVM {
 		if(addressValid){
 			addressValid = Model.Instance().setAddress(address);
 		}
-		UpdateEvent.fire(this, null);
+		UpdateEvent.fire(fireKey, null);
+	}
+	
+	private boolean useNfc = false;
+	public void UseNFC(boolean value){
+		useNfc = value;
+		String cardAddress = Model.Instance().getCardAddress();
+		if(useNfc && cardAddress != null && cardAddress.length() > 0){
+			Address(cardAddress);
+			useNfc = false;
+			UpdateEvent.fire(fireKey, null);
+		}
 	}
 	
 	private Double fee = 0.0;
@@ -58,7 +76,7 @@ public class SettingsPageVM {
 			feeDollarValue = fee * CurrencyApiConnector.DollarValue(ChosenCurrency());
 			Model.Instance().setFee(feeDollarValue);
 		}
-		UpdateEvent.fire(this, null);
+		UpdateEvent.fire(fireKey, null);
 	}
 	
 	private Currency currency = Currency.Apples;
@@ -72,7 +90,7 @@ public class SettingsPageVM {
 		
 		fee = feeDollarValue / CurrencyApiConnector.DollarValue(value);
 		
-		UpdateEvent.fire(this, null);
+		UpdateEvent.fire(fireKey, null);
 	}
 	
 	private boolean courtesyOK = false;
@@ -82,40 +100,31 @@ public class SettingsPageVM {
 	public void CourtesyOK(boolean value){
 		courtesyOK = value;
 		Model.Instance().setCourtesyOK(courtesyOK);
-		UpdateEvent.fire(this, null);
+		UpdateEvent.fire(fireKey, null);
 	}
 	
 	private boolean addressValid = false;
-	private boolean checksumValid = true;
 	private boolean feeValid = true; //Amount too high.
 	public boolean IsValid(){
 		return addressValid && feeValid;
 	}
 	public boolean IsAddressValid(){
-		return addressValid && checksumValid;
+		return addressValid;
 	}
 	
-	/*public void Submit(){ //TODO: Save simply at valid data and remove OK btn etc..
-		boolean success = true;
-		String error = null;
-		if(IsValid())
-		{
-			success = success && Model.Instance().setAddress(address);
-			checksumValid = success;
-			if(!success){
-				 error = "Address checksum mismatch, no settings saved.";
-			}
+	private class ModelListener extends EventListener<Object>{
+		@Override
+		public void onEvent(Object event) {
+			try{
+				String cardAddress = Model.Instance().getCardAddress();
+				if(useNfc && cardAddress != null && cardAddress.length() > 0){
+					useNfc = false;
+					Address(cardAddress);
+					UpdateEvent.fire(fireKey, null);
+				}
+			}catch (Exception ex){
+	    		MessageManager.Instance().AddMessage(ex.toString(), true);
+	    	}
 		}
-		
-		if(!IsValid() || !success){
-			if(error == null)
-				error = !addressValid
-					? "Address invalid, no settings saved."
-					: "Unknown error saving settings.";
-			
-			MessageManager.Instance().AddMessage(error, true);
-		}
-		UpdateEvent.fire(this, null);
-	}*/
-	
+    }
 }
