@@ -41,6 +41,7 @@
 	<string name="HistoryHeaderText">History:</string>
 	<string name="NoPINText">No PIN required by your card for smaller amounts.</string>
 	<string name="CardReadyText">No card.</string>
+	<string name="TypeQRCodeButtonText">QR Code</string>
 	<string name="TypeChoiceButtonText">Type it</string>
 	<string name="NFCChoiceButtonText">Use NFC</string>
 </resources>
