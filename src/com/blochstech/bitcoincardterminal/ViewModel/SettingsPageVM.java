@@ -1,5 +1,7 @@
 package com.blochstech.bitcoincardterminal.ViewModel;
 
+import android.widget.Toast;
+
 import com.blochstech.bitcoincardterminal.Model.Model;
 import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Model.Communication.TypeConverter;
@@ -48,7 +50,7 @@ public class SettingsPageVM {
 		addressValid = TypeConverter.verifyBase58CheckSum(address);
 		if(addressValid){
 			addressValid = Model.Instance().setAddress(address);
-		}
+		} 
 		UpdateEvent.fire(fireKey, null);
 	}
 	

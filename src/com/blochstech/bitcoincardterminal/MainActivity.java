@@ -6,14 +6,19 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.NfcA;
 import android.os.Bundle;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.DialogInterface.OnDismissListener;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.blochstech.bitcoincardterminal.Model.Model;
 import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
@@ -21,6 +26,9 @@ import com.blochstech.bitcoincardterminal.View.MainPage;
 import com.blochstech.bitcoincardterminal.View.PageTags;
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.MessageManager;
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.NavigationManager;
+import com.blochstech.bitcoincardterminal.scanner.zbar.Result;
+import com.blochstech.bitcoincardterminal.scanner.zbar.ZBarScannerView;
+import com.blochstech.bitcoincardterminal.scanner.zbar.ZBarScannerView.ResultHandler;
 
 //This class should get system intents and host the main view fragment.
 //This class should let other classes handle intents and such (model only).
@@ -36,6 +44,8 @@ public class MainActivity extends FragmentActivity {
 		Context res = instance != null ? instance.getApplicationContext() : null;
 		return res;
 	}
+	
+	
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {

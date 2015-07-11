@@ -6,14 +6,24 @@ import com.blochstech.bitcoincardterminal.MainActivity;
 import com.blochstech.bitcoincardterminal.R;
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
 import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
+import com.blochstech.bitcoincardterminal.Model.Communication.TypeConverter;
 import com.blochstech.bitcoincardterminal.Utils.EventListener;
+import com.blochstech.bitcoincardterminal.Utils.RegexUtil;
 import com.blochstech.bitcoincardterminal.Utils.SyntacticSugar;
 import com.blochstech.bitcoincardterminal.ViewModel.SettingsPageVM;
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.MessageManager;
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.NavigationManager;
 import com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers.PageManager;
+import com.blochstech.bitcoincardterminal.scanner.zbar.Result;
+import com.blochstech.bitcoincardterminal.scanner.zbar.ZBarScannerView;
+import com.blochstech.bitcoincardterminal.scanner.zbar.ZBarScannerView.ResultHandler;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -24,6 +34,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 //Everything in view classes will be destroyed at whim by Android. VMs and model/database should hold logic and information.
 //Views defined in layout xml files.
@@ -50,6 +61,51 @@ public class SettingsPage extends Fragment {
 	
 	private boolean initialized = false;
 	
+
+	
+	/**
+     * Used when user selects QRCode
+     */
+    private void setupQRCodeScanner() {
+    	
+    	AlertDialog.Builder scanQRdialog = new AlertDialog.Builder(MainActivity.instance);
+    	View dialoglayout = LayoutInflater.from(MainActivity.instance).inflate(R.layout.zbar_capture, null);
+    	final ZBarScannerView zBarScannerView = (ZBarScannerView)dialoglayout.findViewById(R.id.scanner_view);
+    	scanQRdialog.setView(dialoglayout);
+    	
+    	final AlertDialog dialog = scanQRdialog.create();
+    	if(zBarScannerView != null) {
+	    	 zBarScannerView.setResultHandler(new ResultHandler() {
+				
+				@Override
+				public void handleResult(Result rawResult) {
+					// TODO Auto-generated method stub
+					String scan = rawResult.getContents();
+					if(!RegexUtil.isMatch(scan, RegexUtil.CommonPatterns.BASE58_CHARS) || !TypeConverter.verifyBase58CheckSum(scan)) {
+						Toast.makeText(getActivity(), "Invalid Receiving Bitcoin address: "+scan, Toast.LENGTH_LONG).show();
+					}
+					myVM.Address(scan);
+					dialog.dismiss();
+				}
+			});
+	       
+	    }
+    	
+    	dialog.setOnDismissListener(new OnDismissListener() {
+			
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				   if(zBarScannerView != null) {
+					   zBarScannerView.stopCamera();
+				   }
+				   
+			}
+		});
+    	dialog.show();
+    	zBarScannerView.startCamera();
+	
+    }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -214,6 +270,15 @@ public class SettingsPage extends Fragment {
 	            }
 	        });
 	        
+	        //Set up QRcode button:
+	        Button qrCodeButton = (Button) dialog.findViewById(R.id.TypeQRCodeButton);
+	        qrCodeButton.setOnClickListener(new OnClickListener() {
+	        	@Override
+	            public void onClick(View v) {
+		        	dialog.hide();
+		        	setupQRCodeScanner();
+	            }
+	        });
 	        Button nfcButton = (Button) dialog.findViewById(R.id.NFCChoiceButton);
 	        nfcButton.setOnClickListener(new OnClickListener() {
 	        	@Override
@@ -227,6 +292,8 @@ public class SettingsPage extends Fragment {
         //now that the dialog is set up, it's time to show it    
         dialog.show();
     }
+    
+   
     
 	private void selectButton(Currency currency){
     	btcButton.setEnabled(currency != Currency.MicroBitcoins);

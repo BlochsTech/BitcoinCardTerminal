@@ -115,7 +115,7 @@ public class WheelView extends View {
 	}
 
 	/**
-	 * Constructor
+	 * Constructorx
 	 */
 	public WheelView(Context context) {
 		super(context);

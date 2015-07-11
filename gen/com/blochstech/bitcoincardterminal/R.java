@@ -14,6 +14,26 @@ public final class R {
         public static final int ThinBlue=0x7f050002;
         public static final int ThinRed=0x7f050001;
         public static final int WhiteNothing=0x7f050000;
+        /**  Scanner 
+         */
+        public static final int contents_text=0x7f050003;
+        public static final int encode_view=0x7f050004;
+        public static final int possible_result_points=0x7f050005;
+        /**  Android standard ICS color 
+         */
+        public static final int result_minor_text=0x7f050006;
+        public static final int result_points=0x7f050007;
+        /**  Android standard ICS color 
+         */
+        public static final int result_text=0x7f050008;
+        public static final int result_view=0x7f050009;
+        public static final int status_text=0x7f05000a;
+        public static final int transparent=0x7f05000b;
+        public static final int viewfinder_border=0x7f05000e;
+        public static final int viewfinder_laser=0x7f05000c;
+        /**  Android standard ICS color 
+         */
+        public static final int viewfinder_mask=0x7f05000d;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -32,52 +52,59 @@ public final class R {
         public static final int wheel_val=0x7f020003;
     }
     public static final class id {
-        public static final int NFCChoiceButton=0x7f0a0001;
-        public static final int TypeChoiceButton=0x7f0a0000;
-        public static final int action_settings=0x7f0a002d;
-        public static final int addressLabel=0x7f0a001e;
-        public static final int addressText=0x7f0a001f;
-        public static final int appleButton=0x7f0a0022;
-        public static final int btcButton=0x7f0a0021;
-        public static final int cancelPinButton=0x7f0a001c;
-        public static final int cardReadyText=0x7f0a000f;
-        public static final int cardShortCharge=0x7f0a000b;
-        public static final int claimedCharge=0x7f0a000c;
-        public static final int claimedChargeBTC=0x7f0a000d;
-        public static final int claimedShortCharge=0x7f0a000a;
-        public static final int courtesyCheckBox=0x7f0a002b;
-        public static final int courtesyLabel=0x7f0a002a;
-        public static final int currencyText=0x7f0a0026;
-        public static final int deletePinButton=0x7f0a001b;
-        public static final int detailsText=0x7f0a0020;
-        public static final int dollarButton=0x7f0a0025;
-        public static final int eightPinButton=0x7f0a0012;
-        public static final int euroButton=0x7f0a0024;
-        public static final int feeCurrency=0x7f0a0029;
-        public static final int feeLabel=0x7f0a0027;
-        public static final int feeText=0x7f0a0028;
-        public static final int fivePinButton=0x7f0a0015;
-        public static final int fourPinButton=0x7f0a0014;
-        public static final int historyHeaderText=0x7f0a0007;
-        public static final int listView1=0x7f0a0008;
-        public static final int ninePinButton=0x7f0a0013;
-        public static final int noPINText=0x7f0a0010;
-        public static final int okPinButton=0x7f0a001d;
-        public static final int okPriceButton=0x7f0a0005;
-        public static final int okSettingsButton=0x7f0a002c;
-        public static final int onePinButton=0x7f0a0017;
-        public static final int pager=0x7f0a0009;
-        public static final int pinCode=0x7f0a000e;
-        public static final int priceBox=0x7f0a0003;
-        public static final int priceCurrency=0x7f0a0004;
-        public static final int priceText=0x7f0a0002;
-        public static final int reuseablePlaceholder=0x7f0a0006;
-        public static final int sevenPinButton=0x7f0a0011;
-        public static final int sixPinButton=0x7f0a0016;
-        public static final int threePinButton=0x7f0a0019;
-        public static final int twoPinButton=0x7f0a0018;
-        public static final int yuanButton=0x7f0a0023;
-        public static final int zeroPinButton=0x7f0a001a;
+        public static final int NFCChoiceButton=0x7f0b0002;
+        public static final int TypeChoiceButton=0x7f0b0000;
+        public static final int TypeQRCodeButton=0x7f0b0001;
+        public static final int action_settings=0x7f0b0030;
+        public static final int addressLabel=0x7f0b0020;
+        public static final int addressText=0x7f0b0021;
+        public static final int appleButton=0x7f0b0024;
+        public static final int btcButton=0x7f0b0023;
+        public static final int cancelPinButton=0x7f0b001d;
+        public static final int cardReadyText=0x7f0b0010;
+        public static final int cardShortCharge=0x7f0b000c;
+        public static final int claimedCharge=0x7f0b000d;
+        public static final int claimedChargeBTC=0x7f0b000e;
+        public static final int claimedShortCharge=0x7f0b000b;
+        public static final int courtesyCheckBox=0x7f0b002d;
+        public static final int courtesyLabel=0x7f0b002c;
+        public static final int currencyText=0x7f0b0028;
+        public static final int deletePinButton=0x7f0b001c;
+        public static final int detailsText=0x7f0b0022;
+        public static final int dollarButton=0x7f0b0027;
+        public static final int eightPinButton=0x7f0b0013;
+        public static final int euroButton=0x7f0b0026;
+        public static final int feeCurrency=0x7f0b002b;
+        public static final int feeLabel=0x7f0b0029;
+        public static final int feeText=0x7f0b002a;
+        public static final int fivePinButton=0x7f0b0016;
+        public static final int fourPinButton=0x7f0b0015;
+        public static final int historyHeaderText=0x7f0b0008;
+        public static final int listView1=0x7f0b0009;
+        public static final int ninePinButton=0x7f0b0014;
+        public static final int noPINText=0x7f0b0011;
+        public static final int okPinButton=0x7f0b001e;
+        public static final int okPriceButton=0x7f0b0006;
+        public static final int okSettingsButton=0x7f0b002e;
+        public static final int onePinButton=0x7f0b0018;
+        public static final int pager=0x7f0b000a;
+        public static final int pinCode=0x7f0b000f;
+        public static final int priceBox=0x7f0b0004;
+        public static final int priceCurrency=0x7f0b0005;
+        public static final int priceText=0x7f0b0003;
+        public static final int reuseablePlaceholder=0x7f0b0007;
+        public static final int scanner_stub=0x7f0b001f;
+        public static final int scanner_view=0x7f0b002f;
+        public static final int sevenPinButton=0x7f0b0012;
+        public static final int sixPinButton=0x7f0b0017;
+        public static final int threePinButton=0x7f0b001a;
+        public static final int twoPinButton=0x7f0b0019;
+        public static final int yuanButton=0x7f0b0025;
+        public static final int zeroPinButton=0x7f0b001b;
+    }
+    public static final class integer {
+        public static final int viewfinder_border_length=0x7f070001;
+        public static final int viewfinder_border_width=0x7f070000;
     }
     public static final class layout {
         public static final int addressloaddialog=0x7f030000;
@@ -86,54 +113,57 @@ public final class R {
         public static final int historypage=0x7f030003;
         public static final int mainpage=0x7f030004;
         public static final int pinpage=0x7f030005;
-        public static final int settingspage=0x7f030006;
+        public static final int scan_capture=0x7f030006;
+        public static final int settingspage=0x7f030007;
+        public static final int zbar_capture=0x7f030008;
     }
     public static final class menu {
-        public static final int main=0x7f090000;
+        public static final int main=0x7f0a0000;
     }
     public static final class string {
-        public static final int AddressHint=0x7f070011;
-        public static final int AddressLabel=0x7f070010;
-        public static final int AppleSign=0x7f070007;
-        public static final int BTCSign=0x7f07000b;
-        public static final int CancelLabel=0x7f070015;
-        public static final int CardReadyText=0x7f070027;
-        public static final int CommandBytesS=0x7f070004;
-        public static final int CourtesyLabel=0x7f070012;
-        public static final int CourtesyText=0x7f070013;
-        public static final int CurrencyText=0x7f07000c;
-        public static final int DeleteSign=0x7f070016;
-        public static final int DollarSign=0x7f07000a;
-        public static final int EightSign=0x7f070023;
-        public static final int EuroSign=0x7f070009;
-        public static final int FeeCurrency=0x7f07000f;
-        public static final int FeeHint=0x7f07000e;
-        public static final int FeeLabel=0x7f07000d;
-        public static final int FiveSign=0x7f070020;
-        public static final int FourSign=0x7f07001f;
-        public static final int HistoryHeaderText=0x7f070025;
-        public static final int LabelCommandS=0x7f070003;
-        public static final int LabelCurrency=0x7f070006;
-        public static final int LabelPrice=0x7f070017;
-        public static final int LabelTestText=0x7f070019;
-        public static final int LabelTestText2=0x7f07001a;
-        public static final int NFCChoiceButtonText=0x7f070029;
-        public static final int NineSign=0x7f070024;
-        public static final int NoPINText=0x7f070026;
-        public static final int OkLabel=0x7f070014;
-        public static final int OneSign=0x7f07001c;
-        public static final int PriceHint=0x7f070018;
-        public static final int SendButton=0x7f070005;
-        public static final int SevenSign=0x7f070022;
-        public static final int SixSign=0x7f070021;
-        public static final int ThreeSign=0x7f07001e;
-        public static final int TwoSign=0x7f07001d;
-        public static final int TypeChoiceButtonText=0x7f070028;
-        public static final int YuanSign=0x7f070008;
-        public static final int ZeroSign=0x7f07001b;
-        public static final int action_settings=0x7f070001;
-        public static final int app_name=0x7f070000;
-        public static final int hello_world=0x7f070002;
+        public static final int AddressHint=0x7f080011;
+        public static final int AddressLabel=0x7f080010;
+        public static final int AppleSign=0x7f080007;
+        public static final int BTCSign=0x7f08000b;
+        public static final int CancelLabel=0x7f080015;
+        public static final int CardReadyText=0x7f080027;
+        public static final int CommandBytesS=0x7f080004;
+        public static final int CourtesyLabel=0x7f080012;
+        public static final int CourtesyText=0x7f080013;
+        public static final int CurrencyText=0x7f08000c;
+        public static final int DeleteSign=0x7f080016;
+        public static final int DollarSign=0x7f08000a;
+        public static final int EightSign=0x7f080023;
+        public static final int EuroSign=0x7f080009;
+        public static final int FeeCurrency=0x7f08000f;
+        public static final int FeeHint=0x7f08000e;
+        public static final int FeeLabel=0x7f08000d;
+        public static final int FiveSign=0x7f080020;
+        public static final int FourSign=0x7f08001f;
+        public static final int HistoryHeaderText=0x7f080025;
+        public static final int LabelCommandS=0x7f080003;
+        public static final int LabelCurrency=0x7f080006;
+        public static final int LabelPrice=0x7f080017;
+        public static final int LabelTestText=0x7f080019;
+        public static final int LabelTestText2=0x7f08001a;
+        public static final int NFCChoiceButtonText=0x7f08002a;
+        public static final int NineSign=0x7f080024;
+        public static final int NoPINText=0x7f080026;
+        public static final int OkLabel=0x7f080014;
+        public static final int OneSign=0x7f08001c;
+        public static final int PriceHint=0x7f080018;
+        public static final int SendButton=0x7f080005;
+        public static final int SevenSign=0x7f080022;
+        public static final int SixSign=0x7f080021;
+        public static final int ThreeSign=0x7f08001e;
+        public static final int TwoSign=0x7f08001d;
+        public static final int TypeChoiceButtonText=0x7f080029;
+        public static final int TypeQRCodeButtonText=0x7f080028;
+        public static final int YuanSign=0x7f080008;
+        public static final int ZeroSign=0x7f08001b;
+        public static final int action_settings=0x7f080001;
+        public static final int app_name=0x7f080000;
+        public static final int hello_world=0x7f080002;
     }
     public static final class style {
         /** 
@@ -157,11 +187,12 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f080000;
+        public static final int AppBaseTheme=0x7f090000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f080001;
+        public static final int AppTheme=0x7f090001;
+        public static final int Theme_Transparent=0x7f090002;
     }
     public static final class xml {
         public static final int tech_list=0x7f040000;
