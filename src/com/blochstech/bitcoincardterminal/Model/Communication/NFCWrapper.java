@@ -41,7 +41,7 @@ abstract class NFCWrapper {
 		    	if(cardApi != null && cardApi.isConnected()){
 		    		try {
 						cardApi.close(); //Causes IOExceptions on the blocked using threads.
-					} catch (IOException e) {
+					} catch (Exception e) { //Catch exception as null pointers can happen here. (worker thread can set api to null also)
 						cardApi = null;
 						onConnectionEvent(false);
 					}
