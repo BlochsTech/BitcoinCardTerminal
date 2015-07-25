@@ -18,12 +18,10 @@ import com.blochstech.bitcoincardterminal.scanner.zbar.Result;
 import com.blochstech.bitcoincardterminal.scanner.zbar.ZBarScannerView;
 import com.blochstech.bitcoincardterminal.scanner.zbar.ZBarScannerView.ResultHandler;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -66,44 +64,78 @@ public class SettingsPage extends Fragment {
 	/**
      * Used when user selects QRCode
      */
+	private AlertDialog qrDialog = null;
+	private ZBarScannerView zBarScannerView = null;
     private void setupQRCodeScanner() {
-    	
-    	AlertDialog.Builder scanQRdialog = new AlertDialog.Builder(MainActivity.instance);
-    	View dialoglayout = LayoutInflater.from(MainActivity.instance).inflate(R.layout.zbar_capture, null);
-    	final ZBarScannerView zBarScannerView = (ZBarScannerView)dialoglayout.findViewById(R.id.scanner_view);
-    	scanQRdialog.setView(dialoglayout);
-    	
-    	final AlertDialog dialog = scanQRdialog.create();
-    	if(zBarScannerView != null) {
-	    	 zBarScannerView.setResultHandler(new ResultHandler() {
-				
-				@Override
-				public void handleResult(Result rawResult) {
-					// TODO Auto-generated method stub
-					String scan = rawResult.getContents();
-					if(!RegexUtil.isMatch(scan, RegexUtil.CommonPatterns.BASE58_CHARS) || !TypeConverter.verifyBase58CheckSum(scan)) {
-						Toast.makeText(getActivity(), "Invalid Receiving Bitcoin address: "+scan, Toast.LENGTH_LONG).show();
+    	try{
+	    	if(qrDialog == null){
+		    	AlertDialog.Builder scanQRdialog = new AlertDialog.Builder(MainActivity.instance);
+		    	View dialoglayout = LayoutInflater.from(MainActivity.instance).inflate(R.layout.zbar_capture, null);
+		    	zBarScannerView = (ZBarScannerView)dialoglayout.findViewById(R.id.scanner_view);
+		    	scanQRdialog.setView(dialoglayout);
+		    	
+		    	//final AlertDialog dialog = scanQRdialog.create();
+		    	qrDialog = scanQRdialog.create();
+		    	
+		    	if(zBarScannerView != null) {
+			    	 zBarScannerView.setResultHandler(new ResultHandler() {
+						
+						@Override
+						public void handleResult(Result rawResult) {
+							// TODO Auto-generated method stub
+							String scan = rawResult.getContents();
+							if(!RegexUtil.isMatch(scan, RegexUtil.CommonPatterns.BASE58_CHARS) || !TypeConverter.verifyBase58CheckSum(scan)) {
+								Toast.makeText(getActivity(), "Invalid Receiving Bitcoin address: "+scan, Toast.LENGTH_LONG).show();
+							}else{
+								myVM.Address(scan);
+							}
+							hideQrDialog();
+						}
+					});
+			       
+			    }
+		    	
+		    	qrDialog.setOnDismissListener(new OnDismissListener() {
+					
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						   if(zBarScannerView != null) {
+							   zBarScannerView.stopCamera();
+						   }
 					}
-					myVM.Address(scan);
-					dialog.dismiss();
-				}
-			});
-	       
-	    }
-    	
-    	dialog.setOnDismissListener(new OnDismissListener() {
-			
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				   if(zBarScannerView != null) {
-					   zBarScannerView.stopCamera();
-				   }
-				   
-			}
-		});
-    	dialog.show();
-    	zBarScannerView.startCamera();
-	
+				});
+		    	
+		    	zBarScannerView.startCamera();
+	    	}
+    	}catch (Exception ex){
+    		MessageManager.Instance().AddMessage(ex.toString(), true);
+    	}
+    }
+    
+    private void showQrDialog(){
+    	setupQRCodeScanner();
+    	if(qrDialog != null){
+    		qrDialog.show();
+    	}
+    }
+    private void hideQrDialog(){
+    	if(qrDialog != null){
+    		qrDialog.hide();
+    	}
+    }
+    private void stopOrStartCamera(boolean value){
+	    try{
+	    	if(zBarScannerView == null)
+	    		return;
+	    	
+	    	if(value){
+	    		zBarScannerView.startCamera();
+	    	}else{
+	    		zBarScannerView.stopCamera();
+	    	}
+    	}catch (Exception ex){
+			MessageManager.Instance().AddMessage(ex.toString(), true);
+		}
     }
     
     @Override
@@ -148,6 +180,8 @@ public class SettingsPage extends Fragment {
     	addressBox.clickEvent.register(textClickListener);
     	feeBox.updateEvent.register(textListener);
     	
+    	setupQRCodeScanner();
+    	
     	initialized = true;
     	update();
         
@@ -162,6 +196,7 @@ public class SettingsPage extends Fragment {
     		feeBox.ignoreTextChanges(true);
     	if(addressBox != null)
     		addressBox.ignoreTextChanges(true);
+    	stopOrStartCamera(false);
     	super.onPause();
     }
     
@@ -174,6 +209,7 @@ public class SettingsPage extends Fragment {
     		feeBox.ignoreTextChanges(false);
     	if(addressBox != null)
     		addressBox.ignoreTextChanges(false);
+    	stopOrStartCamera(true);
     	update();
     }
     
@@ -276,7 +312,10 @@ public class SettingsPage extends Fragment {
 	        	@Override
 	            public void onClick(View v) {
 		        	dialog.hide();
-		        	setupQRCodeScanner();
+		        	
+		        	SetUseType(false);
+		        	showQrDialog();
+		        	//setupQRCodeScanner();
 	            }
 	        });
 	        Button nfcButton = (Button) dialog.findViewById(R.id.NFCChoiceButton);

@@ -41,7 +41,7 @@ abstract class NFCWrapper {
 		    	if(cardApi != null && cardApi.isConnected()){
 		    		try {
 						cardApi.close(); //Causes IOExceptions on the blocked using threads.
-					} catch (Exception e) { //Catch exception as null pointers can happen here. (worker thread can set api to null also)
+		    		} catch (Exception e) { //Catch exception as null pointers can happen here. (worker thread can set api to null also)
 						cardApi = null;
 						onConnectionEvent(false);
 					}
@@ -87,12 +87,12 @@ abstract class NFCWrapper {
 		while(holder != null && holdObj != holder)
 		{
 			try {
-				this.wait(20000);
+				this.wait(2000);
 			} catch (InterruptedException e) {}
-			if(System.currentTimeMillis() - startTime > 20000)
+			if(System.currentTimeMillis() - startTime > 4000)
 			{
 				if(Tags.DEBUG)
-					Log.e(Tags.APP_TAG, "FATAL: NfcAWrapper was deadlocked for 20 seconds. Attempting:" + holdObj + " Holding:" + holder);
+					Log.e(Tags.APP_TAG, "FATAL: NfcAWrapper was deadlocked for 4 seconds. Attempting:" + holdObj + " Holding:" + holder);
 			}
 		}
 		holder = holdObj; //Thread.currentThread();
@@ -178,12 +178,14 @@ abstract class NFCWrapper {
 			    	
 			    	//If has task and connected, send task:
 			    	String savedTask = "";
+			    	long startMillis = 0;
 			    	if(task != null && cardApi != null && cardApi.isConnected()){
 			    		actionTaken = true;
 			    		try {
 			    			Leave(insideThread);
 			    			failed = true;
 			    			savedTask = "Task1:" + ByteConversionUtil.byteArrayToHexString(task);
+			    			startMillis = System.currentTimeMillis();
 							response = cardApi.transceive(task);
 							savedTask = savedTask + " Task2:" + ByteConversionUtil.byteArrayToHexString(task);
 							failed = false;
@@ -193,7 +195,13 @@ abstract class NFCWrapper {
 						} catch (Exception te) {
 							if(failed)
 								Enter(insideThread);
-							Exception nfcEx = new Exception(te.toString() + " Task:"+ ByteConversionUtil.byteArrayToHexString(task));
+							
+							Exception nfcEx;
+							if(System.currentTimeMillis() - startMillis >= 10000){
+								nfcEx = new Exception("Probable timeout. " + te.toString() + " Task:"+ ByteConversionUtil.byteArrayToHexString(task));
+							}else{
+								nfcEx = new Exception(te.toString() + " Task:"+ ByteConversionUtil.byteArrayToHexString(task));
+							}
 							task = null;
 							publishProgress(new EventUpdate(nfcEx));
 							try {

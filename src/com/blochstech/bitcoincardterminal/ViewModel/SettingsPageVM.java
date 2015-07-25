@@ -1,7 +1,5 @@
 package com.blochstech.bitcoincardterminal.ViewModel;
 
-import android.widget.Toast;
-
 import com.blochstech.bitcoincardterminal.Model.Model;
 import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Model.Communication.TypeConverter;

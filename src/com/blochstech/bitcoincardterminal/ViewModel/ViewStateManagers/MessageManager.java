@@ -38,7 +38,6 @@ public class MessageManager {
 		AddMessage(msg, isError, false);
 	}
 	
-	@SuppressWarnings("unused")
 	public void AddMessage(String msg, boolean isError, boolean isWarning){
 		//TODO: Add to list + android log... rest can wait... post log guide in this class.
 		if(msg != null && !msg.isEmpty() && Tags.DEBUG){
