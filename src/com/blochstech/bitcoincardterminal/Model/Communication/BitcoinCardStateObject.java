@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Locale;
 
+import com.blochstech.bitcoincardterminal.Model.AppSettings;
 import com.blochstech.bitcoincardterminal.Utils.ShortNumberConverter;
 import com.blochstech.bitcoincardterminal.Utils.SyntacticSugar;
 
@@ -249,6 +250,9 @@ class BitcoinCardStateObject {
 		if (paymentComplete != 0){
 			return paymentComplete == 1 ? "Payment complete." : "Error";
 		}
+		
+		if(amount < AppSettings.DUST_LIMIT)
+			return "Below dust limit.";
 		
 		if(maxCardCharge != null && totalChargeAsBitcoin() != null && maxCardCharge < totalChargeAsBitcoin())
 			return "Over max " + ShortNumberConverter.ToShort(maxCardCharge) + ".";

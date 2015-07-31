@@ -11,6 +11,7 @@ import com.blochstech.bitcoincardterminal.Utils.ByteConversionUtil;
 import com.blochstech.bitcoincardterminal.Utils.Event;
 import com.blochstech.bitcoincardterminal.Utils.EventListener;
 import com.blochstech.bitcoincardterminal.Utils.SyntacticSugar;
+import com.blochstech.bitcoincardterminal.Model.AppSettings;
 import com.blochstech.bitcoincardterminal.Model.Communication.NetworkCallbackMethods;
 import com.blochstech.bitcoincardterminal.Model.Communication.NetworkPublishResults.SendStatus;
 
@@ -159,7 +160,8 @@ public class BitcoinCard extends NFCWrapper {
 				//Request payment card. Called as soon as possible, not by default after unlocking card as it may show card will accept amount instantly.
 				}else if(state.getAddress() != null && state.amount != null && state.amount > 0.0 //We are ready to charge.
 						&& !state.ChargeSynched() && !state.waitingIsResetRequest
-						&& state.maxCardCharge >= state.totalChargeAsBitcoin()){
+						&& state.maxCardCharge >= state.totalChargeAsBitcoin()
+						&& AppSettings.DUST_LIMIT <= state.amount){
 					
 					//PIN requirement undetermined or card unlocked.
 					//If pin required we need to charge again after unlocking --> Automatic with above if clause.
@@ -483,9 +485,11 @@ public class BitcoinCard extends NFCWrapper {
 								
 								if(!state.waitingIsResetRequest && tmpRes != null && tmpRes.length() > 0){
 									networkConnector.publishTX(state.paymentTxBytes);
-								}else if (state.waitingIsResetRequest){
-									messageEvent.fire(fireKey, new Message("Attempted to publish empty TX.", MessageType.Error)); //TODO: Make sure this never happens.
 								}
+								
+								//else if (state.waitingIsResetRequest){
+								//	messageEvent.fire(fireKey, new Message("Attempted to publish empty TX.", MessageType.Error)); //TODO: Make sure this never happens.
+								//}
 								//TODO: Coomunicate sent TXes to History model/harddisk, for now just straight to the NetworkConnector.
 								
 								//state.paymentComplete = !state.waitingIsResetRequest;
