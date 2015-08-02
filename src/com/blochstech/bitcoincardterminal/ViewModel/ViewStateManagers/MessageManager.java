@@ -42,7 +42,7 @@ public class MessageManager {
 	
 	public void AddMessage(String msg, boolean isError, boolean isWarning){
 		//TODO: Add to list + android log... rest can wait... post log guide in this class.
-		if(msg != null && !msg.isEmpty() && Tags.DEBUG){
+		if(msg != null && !msg.isEmpty() && (Tags.DEBUG || isError)){
 			messages.add(msg);
 			if(isError){
 				Log.e(Tags.APP_TAG, msg);
