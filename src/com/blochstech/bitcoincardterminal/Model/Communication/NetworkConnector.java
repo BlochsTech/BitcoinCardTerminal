@@ -18,13 +18,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.blochstech.bitcoincardterminal.DataLayer.GenericFileCache;
+import com.blochstech.bitcoincardterminal.Stratum.StratumConnector;
 import com.blochstech.bitcoincardterminal.Utils.Event;
-import com.blochstech.bitcoincardterminal.Utils.Match;
-import com.blochstech.bitcoincardterminal.Utils.ParseHelper;
-import com.blochstech.bitcoincardterminal.Utils.RegexUtil;
 import com.blochstech.bitcoincardterminal.Utils.SimpleTuple;
 import com.blochstech.bitcoincardterminal.Utils.Tags;
 import com.blochstech.bitcoincardterminal.Utils.ByteConversionUtil;
+import com.blochstech.bitcoincardterminal.Utils.WebUtil;
 
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
@@ -250,15 +249,18 @@ class NetworkConnector {
 		    					}
 		    				}
 		    				
-		    				if(state.txJSON != null){
-		    					BlockResponse blockResponse = getJSONBlock();
-		    					if(blockResponse.TXIsInABlock){
+		    				//if(state.txJSON != null){
+		    				if(state.txHash != null && state.txJSON != null)
+		    				{
+		    					//Do BlockResponse call (reusing current network thread)
+		    					BlockResponse blockResponse = StratumConnector.GetMekleBranch(state.txHash, state.txJSON.getString("block_height"));
+		    					
+		    					if(blockResponse.HasConnection && blockResponse.TXIsInABlock){
 		    						state.blockData = blockResponse;
 			    					//1 Get bytes:
 			    					state.blockRaw = getRawBlockHeader(blockResponse); //Offline method.
 			    					//2 Get hashses:
 			    					state.hashes = blockResponse.MerkleBranch; //Offline method.
-			    							//getHashes(state.blockJSON, state.txHash);
 			    				}else if(blockResponse.HasConnection){
 		    						NoNewSourcesCode();
 		    					}else{
@@ -378,9 +380,7 @@ class NetworkConnector {
 			boolean failed = false;
 			if (response.getStatusLine().getStatusCode() != 200 && //Ok
 					response.getStatusLine().getStatusCode() != 522) { //Server busy
-				if(Tags.DEBUG)
-					Log.e(Tags.APP_TAG, "Failed : HTTP error code : "
-				   + response.getStatusLine().getStatusCode());
+				WebUtil.HttpResponseLog(response, "NetworkConnector.sendTransaction");
 				failed = true;
 			}else if(response.getStatusLine().getStatusCode() == 522){ //Server busy
 				return new NetworkPublishResults(NetworkPublishResults.SendStatus.Retry, "Server busy, will retry. "
@@ -421,17 +421,23 @@ class NetworkConnector {
 						"https://blockchain.info/unspent?active=" + URLEncoder.encode(query, "UTF-8"));
 				getRequest.addHeader("accept", "application/json");
 				
-				response = client.execute(getRequest);
-				 
-				if(response.getStatusLine().getStatusCode() == 500){
-					client.getConnectionManager().shutdown();
-					client = AndroidHttpClient.newInstance(UserAgent);
-					return new SimpleTuple<Boolean,String[]>(true, null); //Connection true for this 500 and false everywhere else because 500 is returned here if no unspent sources.
-				}else if (response.getStatusLine().getStatusCode() != 200) {
-					if(Tags.DEBUG)
-						Log.e(Tags.APP_TAG, "Failed : HTTP error code : "
-					   + response.getStatusLine().getStatusCode());
-					return new SimpleTuple<Boolean,String[]>(false, null);
+				int retry = 0;
+				while(retry < 3){
+					retry++;
+					response = client.execute(getRequest);
+					
+					int statusCode = response.getStatusLine().getStatusCode();
+					if(statusCode == 500){
+						client.getConnectionManager().shutdown();
+						client = AndroidHttpClient.newInstance(UserAgent);
+						return new SimpleTuple<Boolean,String[]>(true, null); //Connection true for this 500 and false everywhere else because 500 is returned here if no unspent sources.
+					}else if(statusCode == 522 || statusCode == 429){
+						client.getConnectionManager().shutdown();
+						client = AndroidHttpClient.newInstance(UserAgent);
+					}else if (statusCode != 200) {
+						WebUtil.HttpResponseLog(response, "NetworkConnector.getTXIds");
+						return new SimpleTuple<Boolean,String[]>(false, null);
+					}
 				}
 				
 				br = new BufferedReader(
@@ -471,17 +477,23 @@ class NetworkConnector {
 				}
 				getRequest.addHeader("accept", "application/json");
 				
-				response = client.execute(getRequest);
-				 
-				if(response.getStatusLine().getStatusCode() == 500){
-					client.getConnectionManager().shutdown();
-					client = AndroidHttpClient.newInstance(UserAgent);
-					return new SimpleTuple<Boolean,Object[]>(false, null);
-				}else if (response.getStatusLine().getStatusCode() != 200) {
-					if(Tags.DEBUG)
-						Log.e(Tags.APP_TAG, "Failed : HTTP error code : "
-					   + response.getStatusLine().getStatusCode());
-					return new SimpleTuple<Boolean,Object[]>(false, null);
+				int retry = 0;
+				while(retry < 3){
+					retry++;
+					response = client.execute(getRequest);
+					
+					int statusCode = response.getStatusLine().getStatusCode();
+					if(statusCode == 500){
+						client.getConnectionManager().shutdown();
+						client = AndroidHttpClient.newInstance(UserAgent);
+						return new SimpleTuple<Boolean,Object[]>(false, null);
+					}else if (statusCode == 522 || statusCode == 429) {
+						client.getConnectionManager().shutdown();
+						client = AndroidHttpClient.newInstance(UserAgent);
+					}else if (statusCode != 200) {
+						WebUtil.HttpResponseLog(response, "NetworkConnector.getTX");
+						return new SimpleTuple<Boolean,Object[]>(false, null);
+					}
 				}
 		 
 				br = new BufferedReader(
@@ -499,7 +511,7 @@ class NetworkConnector {
 			return new SimpleTuple<Boolean,Object[]>(true, new Object[]{json, ByteConversionUtil.hexStringToByteArray(result)});
 		}
 	
-		private BlockResponse getJSONBlock() throws Exception{
+		/*private BlockResponse getJSONBlock() throws Exception{
 			if(!state.txJSON.has("block_height")){ //Sorts away unconfirmed sources - we need at least 1 block to have merkle tree and difficulty etc.. 
 				return new BlockResponse(true, false);
 			}
@@ -634,7 +646,7 @@ class NetworkConnector {
 								}
 								tempString = sb.toString();
 								twoHashes = RegexUtil.countMatches(tempString, "\"hash\":\"[0-9a-f]{64}\"") > 1;
-							}*/
+							}* /
 						}else{
 							minCount = minCount + textBlockSize;
 						}
@@ -670,8 +682,8 @@ class NetworkConnector {
 				}
 			}
 			
-			throw new Exception("Unexpected outcome, check logic.");*/
-		}
+			throw new Exception("Unexpected outcome, check logic.");* /
+		}*/
 		
 		private byte[] getRawBlockHeader(BlockResponse header) throws Exception{
 			byte[] result = new byte[80];
@@ -784,7 +796,7 @@ class NetworkConnector {
 		//1. Two hashes only are given at a time.
 		//2. prevRow is built using these and txes are counted.
 		//3. Once done, execute as usual.
-		private LinkedList<MerkleBranchElement> merkleBranch = new LinkedList<MerkleBranchElement>(); //TODO: Generic array converter in utils?
+		/*private LinkedList<MerkleBranchElement> merkleBranch = new LinkedList<MerkleBranchElement>(); //TODO: Generic array converter in utils?
 		private ArrayList<String> prevRow = new ArrayList<String>();
 		private ArrayList<String> nextRow = new ArrayList<String>();
 		private int level;
@@ -878,7 +890,7 @@ class NetworkConnector {
 					Log.e(Tags.APP_TAG, "Creating merkle branch failed. " + ex.getMessage());
 				return null;
 			}
-		}
+		}*/
 	
 		/*private byte[] getHeader(String hash) throws Exception{
 			getRequest = new HttpGet(
