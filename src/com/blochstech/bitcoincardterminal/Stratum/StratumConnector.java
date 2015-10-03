@@ -52,12 +52,14 @@ public class StratumConnector {
 		if(serverManager == null)
 			serverManager = new StratumServerManager();
 
+		String revTxHash = ByteConversionUtil.reverseByteOrder(txHash);
+		
 		try{
 			if(socket == null)
 				socket = new Socket(serverManager.GetServer(), SERVER_PORT);
 		
 			SimpleWebResponse res = TcpUtil.SendReceiveTcpMessage(socket, 
-					"{ \"id\": 1, \"method\": \"blockchain.transaction.get_merkle\", \"params\": [ \""+txHash+"\", "+blockHeight+" ] }\n");
+					"{ \"id\": 1, \"method\": \"blockchain.transaction.get_merkle\", \"params\": [ \""+revTxHash+"\", "+blockHeight+" ] }\n");
 			
 			SimpleWebResponse headerRes = TcpUtil.SendReceiveTcpMessage(socket, 
 					"{ \"id\": 1, \"method\": \"blockchain.block.get_header\", \"params\": [ "+blockHeight+" ] }\n");
@@ -66,8 +68,8 @@ public class StratumConnector {
 			
 			boolean hasConnection = res != null && res.IsConnected && res.Response != null && res.Response.length() > 0
 					&& headerRes != null && headerRes.IsConnected && headerRes.Response != null && headerRes.Response .length() > 0;
-			boolean txInBlock = hasConnection && res.Response.contains("merkle") && !res.Response.contains("error")
-					&& headerRes.Response.contains("prev_block_hash") && !headerRes.Response.contains("error");
+			boolean txInBlock = hasConnection && res.Response.contains("merkle") &&
+					headerRes.Response.contains("prev_block_hash") && !res.Response.contains("error") && !headerRes.Response.contains("error");
 			BlockResponse result = new BlockResponse(hasConnection, txInBlock);
 			if(!hasConnection || !txInBlock)
 				return result;
@@ -83,7 +85,7 @@ public class StratumConnector {
 			
 			json = new JSONObject(res.Response);
 			json = json.getJSONObject("result");
-			result.MerkleBranch = ConvertToBobcMerkleBranch(txHash, result.MerkleRoot, json.getInt("pos"), json.getJSONArray("merkle"));
+			result.MerkleBranch = ConvertToBobcMerkleBranch(revTxHash, result.MerkleRoot, json.getInt("pos"), json.getJSONArray("merkle"));
 			if(result.MerkleBranch == null)
 				result.TXIsInABlock = false;
 			
@@ -108,7 +110,7 @@ public class StratumConnector {
 		for(int i = 0; i < merkleHashes.length(); i++){
 			divisor = purePow(2, i);
 			divided = pos / divisor;
-			rightSide = divided % 2 == pos % 2;
+			rightSide = divided % 2 == 0;
 			
 			tmpElement = new MerkleBranchElement(ByteConversionUtil.reverseByteOrder(merkleHashes.getString(i)), rightSide, lastHash);
 			result[i] = tmpElement;

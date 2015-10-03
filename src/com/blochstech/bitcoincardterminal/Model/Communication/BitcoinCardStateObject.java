@@ -171,8 +171,8 @@ class BitcoinCardStateObject {
 			return false;
 		
 		for(int i = 0; i < knownSources.size(); i++){
-			if(((source.OutIndex != null && knownSources.get(i).OutIndex.toLowerCase(Locale.ENGLISH).equals(source.OutIndex.toLowerCase(Locale.ENGLISH))) 
-					|| knownSources.get(i).OutIndex == null )
+			if(((source.OutIndex != null && knownSources.get(i).OutIndex != null && knownSources.get(i).OutIndex.toLowerCase(Locale.ENGLISH).equals(source.OutIndex.toLowerCase(Locale.ENGLISH))) 
+					|| knownSources.get(i).OutIndex == null || source.OutIndex == null )
 				&& knownSources.get(i).TXHash.toLowerCase(Locale.ENGLISH).equals(source.TXHash.toLowerCase(Locale.ENGLISH)))
 				return true;
 		}
@@ -207,6 +207,10 @@ class BitcoinCardStateObject {
 	
 	Double totalChargeAsBitcoin(){
 		return fee + terminalAmount + amount;
+	}
+	
+	Double waitingChargeAmount(){
+		return waitingFee + waitingTerminalAmount + waitingAmount;
 	}
 	
 	Double totalWaitingAmount(){

@@ -11,6 +11,7 @@ import com.blochstech.bitcoincardterminal.Utils.ByteConversionUtil;
 import com.blochstech.bitcoincardterminal.Utils.Event;
 import com.blochstech.bitcoincardterminal.Utils.EventListener;
 import com.blochstech.bitcoincardterminal.Utils.SyntacticSugar;
+import com.blochstech.bitcoincardterminal.Utils.Tags;
 import com.blochstech.bitcoincardterminal.Model.AppSettings;
 import com.blochstech.bitcoincardterminal.Model.Communication.NetworkCallbackMethods;
 import com.blochstech.bitcoincardterminal.Model.Communication.NetworkPublishResults.SendStatus;
@@ -167,8 +168,8 @@ public class BitcoinCard extends NFCWrapper {
 					//If pin required we need to charge again after unlocking --> Automatic with above if clause.
 					state.commandInProgress = BitcoinCallbackMethods.RequestPayment;
 					cardMessage = state.updateCardMessageFromState();
-					if(state.totalWaitingAmount() == 0
-							|| state.totalChargeAsBitcoin() <= state.totalWaitingAmount()){
+					if(state.waitingChargeAmount() == 0
+							|| state.totalChargeAsBitcoin() < state.waitingChargeAmount()){
 						super.newTask(CardTaskUtil.getRequestPaymentTask(state.amount, state.terminalAmount, state.fee,
 								state.getAddress(), state.getTerminalAddress()));
 					}else{
@@ -554,6 +555,8 @@ public class BitcoinCard extends NFCWrapper {
 					callbackEvent.fire(fireKey, new Callback(-1));
 					
 					messageEvent.fire(fireKey, new Message("Unexpected byte response ("+byts+") to "+state.commandInProgress+" from BitcoinCard: " + ex.toString(), MessageType.Error));
+					if(Tags.DEBUG)
+						ex.printStackTrace(); //TODO: Make better unified logging system using printStackTrace nicely etc..
 					state.commandInProgress = BitcoinCallbackMethods.DebugOnce;
 					super.newTask(CardTaskUtil.getDebugTask());
 				}

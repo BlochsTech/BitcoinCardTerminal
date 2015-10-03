@@ -437,6 +437,8 @@ class NetworkConnector {
 					}else if (statusCode != 200) {
 						WebUtil.HttpResponseLog(response, "NetworkConnector.getTXIds");
 						return new SimpleTuple<Boolean,String[]>(false, null);
+					}else{
+						break;
 					}
 				}
 				
@@ -493,6 +495,8 @@ class NetworkConnector {
 					}else if (statusCode != 200) {
 						WebUtil.HttpResponseLog(response, "NetworkConnector.getTX");
 						return new SimpleTuple<Boolean,Object[]>(false, null);
+					}else{
+						break;
 					}
 				}
 		 
