@@ -84,7 +84,10 @@ public class BitcoinCard extends NFCWrapper {
 	}
 	
 	public void setFee(Double fee){
-		state.fee = fee;
+		if(fee < AppSettings.MIN_FEE_BITCOINS)
+			state.fee = AppSettings.MIN_FEE_BITCOINS;
+		else
+			state.fee = fee;
 	}
 	
 	public void setAmount(Double amount){

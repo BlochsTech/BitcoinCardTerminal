@@ -1,5 +1,6 @@
 package com.blochstech.bitcoincardterminal.ViewModel;
 
+import com.blochstech.bitcoincardterminal.Model.AppSettings;
 import com.blochstech.bitcoincardterminal.Model.Model;
 import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Model.Communication.TypeConverter;
@@ -74,6 +75,12 @@ public class SettingsPageVM {
 			String cleanValue = value.replace(",", ".");
 			fee = Math.min(Double.parseDouble(cleanValue), 10000.0);
 			feeDollarValue = fee * CurrencyApiConnector.DollarValue(ChosenCurrency());
+			Double btcVal = feeDollarValue / CurrencyApiConnector.DollarValue(Currency.Bitcoins);
+			if(btcVal < AppSettings.MIN_FEE_BITCOINS)
+			{
+				feeDollarValue = AppSettings.MIN_FEE_BITCOINS * CurrencyApiConnector.DollarValue(Currency.Bitcoins);
+				fee = feeDollarValue / CurrencyApiConnector.DollarValue(ChosenCurrency());
+			}
 			Model.Instance().setFee(feeDollarValue);
 		}
 		UpdateEvent.fire(fireKey, null);
