@@ -43,6 +43,7 @@ Temporary Items
 .apdisk
 
 /bin/
+gen/com/blochstech/bitcoincardterminal/R.java
 
 # Copyrighted icons
 *.png

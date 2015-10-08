@@ -1,19 +1,16 @@
 package com.blochstech.bitcoincardterminal.Model.Communication;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.LinkedList;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.json.JSONObject;
 
 import com.blochstech.bitcoincardterminal.DataLayer.GenericFileCache;
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
 import com.blochstech.bitcoincardterminal.Utils.ByteConversionUtil;
 import com.blochstech.bitcoincardterminal.Utils.RegexUtil;
+import com.blochstech.bitcoincardterminal.Utils.SimpleWebResponse;
 import com.blochstech.bitcoincardterminal.Utils.Tags;
+import com.blochstech.bitcoincardterminal.Utils.WebUtil;
 
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
@@ -22,6 +19,7 @@ import android.util.Log;
 public class CurrencyApiConnector {
 	//Client/worker:
 	private final static String userAgent = "BOBC-0 Terminal/0.0/Android";
+	private final static String contentType = "application/json";
 	private static AndroidHttpClient client;
 	
 	private static long lastSynched = 0;
@@ -38,14 +36,14 @@ public class CurrencyApiConnector {
 	private static GenericFileCache<LinkedList<Double>> ratesCache;
 	private final static String ratesCachePath = "/BitcoinTerminal/Currencies/ratesCache.bin";
 	
-	public CurrencyApiTask getWorker(){
+	private CurrencyApiTask getWorker(){
 		return new CurrencyApiTask();
 	}
 	
 	//START WORKER - <StartParamsType, ProgressResultType, PostExecuteType> (doInBackground returns to onPostExecute)
 	private class CurrencyApiTask extends AsyncTask<Void, Double, Void> { //TODO: Init synch on app start-up.
 		
-		private String WebCall(String url) throws IOException{
+		/*private String WebCall(String url) throws IOException{
 			String netResult = "", line;
 			
 			HttpGet getRequest = new HttpGet(url);
@@ -69,7 +67,7 @@ public class CurrencyApiConnector {
 			}
 			
 			return netResult;
-		}
+		}*/
 		
 		protected Void doInBackground(Void... startParams) {
 		    //Do network calls here:
@@ -80,11 +78,16 @@ public class CurrencyApiConnector {
 				client = AndroidHttpClient.newInstance(userAgent);
 			}
 			
+			SimpleWebResponse resp;
+			
 			//BTC rate:
 			try{
-				JSONObject json = new JSONObject(WebCall("https://api.coindesk.com/v1/bpi/currentprice.json"));
-				JSONObject usdObject = json.getJSONObject("bpi").getJSONObject("USD");
-				result[5] = usdObject.getDouble("rate");
+				resp = WebUtil.SimpleHttpGet(client, "https://api.coindesk.com/v1/bpi/currentprice.json", contentType, "CurrencyApiGet_BTC_Rate");
+				if(resp.IsConnected && resp.Response != null){
+					JSONObject json = new JSONObject(resp.Response);
+					JSONObject usdObject = json.getJSONObject("bpi").getJSONObject("USD");
+					result[5] = usdObject.getDouble("rate");
+				}
 			}catch(Exception ex){
 				if(Tags.DEBUG)
 					Log.e(Tags.APP_TAG, "Failed to get BTC/USD rate. Ex: " + ex.toString());
@@ -96,12 +99,15 @@ public class CurrencyApiConnector {
 			
 			//Yuan+Euro rate:
 			try{
-				JSONObject json = new JSONObject(WebCall("http://api.fixer.io/latest"));
-				JSONObject ratesObject = json.getJSONObject("rates");
-				
-				result[4] = ratesObject.getDouble("USD");
-				
-				result[2] = result[4] / ratesObject.getDouble("CNY");
+				resp = WebUtil.SimpleHttpGet(client, "http://api.fixer.io/latest", contentType, "CurrencyApiGet_RMB_EUR_Rate");
+				if(resp.IsConnected && resp.Response != null){
+					JSONObject json = new JSONObject(resp.Response);
+					JSONObject ratesObject = json.getJSONObject("rates");
+					
+					result[4] = ratesObject.getDouble("USD");
+					
+					result[2] = result[4] / ratesObject.getDouble("CNY");
+				}
 			}catch(Exception ex){
 				if(Tags.DEBUG)
 					Log.e(Tags.APP_TAG, "Failed to get YUAN and EUR/USD rate. Ex: " + ex.toString());
@@ -121,7 +127,10 @@ public class CurrencyApiConnector {
 				String webResult, match;
 				
 				for(int j = 0 ; j < urls.length; j++){
-					webResult = WebCall(urls[j]);
+					webResult = "";
+					resp = WebUtil.SimpleHttpGet(client, urls[j], contentType, "CurrencyApiGet_Apple_Rate");
+					if(resp.IsConnected && resp.Response != null)
+						webResult = resp.Response;
 			
 					match = RegexUtil.getMatch(webResult, "Apples \\(1kg\\)[^0-9]*[0-9\\.]+");
 					if(match != null && match.lastIndexOf(" ") != -1){
@@ -193,7 +202,6 @@ public class CurrencyApiConnector {
 	//END WORKER
 	
 	public static void SynchPrices(String caller){
-		//TODO: Persist old prices and use them as default instead of hardcoded start values.
 		
 		if(instance == null){
 			instance = new CurrencyApiConnector();

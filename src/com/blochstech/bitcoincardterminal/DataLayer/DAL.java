@@ -23,9 +23,9 @@ public class DAL implements IDAL {
 		try {
 			messageEvent = new Event<Message>(this);
 			addressCache = new GenericFileCache<String>(addressCachePath, "");
-			feeCache = new GenericFileCache<String>(feeCachePath, "0.01");
+			feeCache = new GenericFileCache<String>(feeCachePath, "100");
 			courtesyOKCache = new GenericFileCache<Boolean>(courtesyOKCachePath, false);
-			currencyCache = new GenericFileCache<Integer>(currencyCachePath, 1);
+			currencyCache = new GenericFileCache<Integer>(currencyCachePath, 0);
 		} catch (Exception e) {
 			Log.e(Tags.APP_TAG, "DAL failed to initialize. Error: " + e.toString());
 		}

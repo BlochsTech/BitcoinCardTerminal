@@ -6,26 +6,24 @@
     
 	 <Button style="?android:attr/buttonBarButtonStyle"
 	     android:id="@+id/TypeChoiceButton"
-	  android:layout_marginTop="5dp"
-	  android:layout_marginLeft="10dp"
-	 android:layout_weight=".50"
+	  
+	 android:layout_weight=".33"
 	 android:layout_width="0dp"
 	 android:layout_height="wrap_content"
 	 android:text="@string/TypeChoiceButtonText" />
 	 
 	  <Button style="?android:attr/buttonBarButtonStyle"
 	     android:id="@+id/TypeQRCodeButton"
-	  android:layout_marginTop="5dp"
-	  android:layout_marginLeft="10dp"
-	 android:layout_weight=".50"
+	  
+	 android:layout_weight=".33"
 	 android:layout_width="0dp"
 	 android:layout_height="wrap_content"
 	 android:text="@string/TypeQRCodeButtonText" />
 	 
 	 <Button style="?android:attr/buttonBarButtonStyle"
 	     android:id="@+id/NFCChoiceButton"
-	 android:layout_marginLeft="10dp"
-	 android:layout_weight=".50"
+    
+	 android:layout_weight=".33"
 	 android:layout_width="0dp"
 	 android:layout_height="wrap_content"
 	 android:text="@string/NFCChoiceButtonText" />

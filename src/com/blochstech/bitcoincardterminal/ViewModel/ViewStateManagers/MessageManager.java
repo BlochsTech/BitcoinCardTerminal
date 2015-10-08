@@ -3,6 +3,7 @@ package com.blochstech.bitcoincardterminal.ViewModel.ViewStateManagers;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.blochstech.bitcoincardterminal.MainActivity;
 import com.blochstech.bitcoincardterminal.Interfaces.Message;
 import com.blochstech.bitcoincardterminal.Interfaces.Message.MessageType;
 import com.blochstech.bitcoincardterminal.Model.Model;
@@ -10,6 +11,7 @@ import com.blochstech.bitcoincardterminal.Utils.EventListener;
 import com.blochstech.bitcoincardterminal.Utils.Tags;
 
 import android.util.Log;
+import android.widget.Toast;
 
 //The core idea is to avoid any one View having to know all the other Views in order to update say a global status icon,
 	//message or page number..
@@ -41,10 +43,11 @@ public class MessageManager {
 	@SuppressWarnings("unused")
 	public void AddMessage(String msg, boolean isError, boolean isWarning){
 		//TODO: Add to list + android log... rest can wait... post log guide in this class.
-		if(msg != null && !msg.isEmpty() && Tags.DEBUG){
+		if(msg != null && !msg.isEmpty() && (Tags.DEBUG || isError)){
 			messages.add(msg);
 			if(isError){
 				Log.e(Tags.APP_TAG, msg);
+				Toast.makeText(MainActivity.GetMainContext(), "ERR: " + msg, Toast.LENGTH_LONG).show();
 			}else if(isWarning){
 				Log.w(Tags.APP_TAG, msg);
 			}else{
