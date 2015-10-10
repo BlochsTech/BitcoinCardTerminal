@@ -33,6 +33,7 @@ public class SettingsPageVM {
 		
 		currency = Model.Instance().getCurrency();
 		fee = feeDollarValue / CurrencyApiConnector.DollarValue(ChosenCurrency());
+		FeeUpdateCheckMin();
 		
 		courtesyOK = Model.Instance().getCourtesyOK();
 	}
@@ -75,15 +76,19 @@ public class SettingsPageVM {
 			String cleanValue = value.replace(",", ".");
 			fee = Math.min(Double.parseDouble(cleanValue), 10000.0);
 			feeDollarValue = fee * CurrencyApiConnector.DollarValue(ChosenCurrency());
-			Double btcVal = feeDollarValue / CurrencyApiConnector.DollarValue(Currency.Bitcoins);
-			if(btcVal < AppSettings.MIN_FEE_BITCOINS)
-			{
-				feeDollarValue = AppSettings.MIN_FEE_BITCOINS * CurrencyApiConnector.DollarValue(Currency.Bitcoins);
-				fee = feeDollarValue / CurrencyApiConnector.DollarValue(ChosenCurrency());
-			}
+			FeeUpdateCheckMin();
 			Model.Instance().setFee(feeDollarValue);
 		}
 		UpdateEvent.fire(fireKey, null);
+	}
+	
+	private void FeeUpdateCheckMin(){
+		Double btcVal = feeDollarValue / CurrencyApiConnector.DollarValue(Currency.Bitcoins);
+		if(btcVal < AppSettings.MIN_FEE_BITCOINS)
+		{
+			feeDollarValue = AppSettings.MIN_FEE_BITCOINS * CurrencyApiConnector.DollarValue(Currency.Bitcoins);
+			fee = feeDollarValue / CurrencyApiConnector.DollarValue(ChosenCurrency());
+		}
 	}
 	
 	private Currency currency = Currency.Apples;
@@ -94,8 +99,8 @@ public class SettingsPageVM {
 		currency = value;
 		Model.Instance().setCurrency(currency);
 		
-		
 		fee = feeDollarValue / CurrencyApiConnector.DollarValue(value);
+		FeeUpdateCheckMin();
 		
 		UpdateEvent.fire(fireKey, null);
 	}
