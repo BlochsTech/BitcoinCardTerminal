@@ -102,7 +102,16 @@ public class Model implements IModel{
 	@Override
 	public void setPrice(Double value) {
 		paymentModel.setPrice(value);
-		cardModel.setCharge(value / CurrencyApiConnector.DollarValue(Currency.Bitcoins), paymentModel.getFee() / CurrencyApiConnector.DollarValue(Currency.Bitcoins), paymentModel.getAddress(), paymentModel.getCourtesyOK());
+
+		Double feeDollarValue = paymentModel.getFee();
+		Double btcVal = feeDollarValue / CurrencyApiConnector.DollarValue(Currency.Bitcoins);
+		if(btcVal < AppSettings.MIN_FEE_BITCOINS)
+		{
+			feeDollarValue = AppSettings.MIN_FEE_BITCOINS * CurrencyApiConnector.DollarValue(Currency.Bitcoins);
+			Model.Instance().setFee(feeDollarValue);
+		}
+
+		cardModel.setCharge(value / CurrencyApiConnector.DollarValue(Currency.Bitcoins), feeDollarValue / CurrencyApiConnector.DollarValue(Currency.Bitcoins), paymentModel.getAddress(), paymentModel.getCourtesyOK());
 	}
 	@Override
 	public Double getPrice() {

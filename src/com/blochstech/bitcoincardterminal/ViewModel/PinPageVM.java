@@ -1,7 +1,6 @@
 package com.blochstech.bitcoincardterminal.ViewModel;
 
 import com.blochstech.bitcoincardterminal.Interfaces.Currency;
-import com.blochstech.bitcoincardterminal.Model.AppSettings;
 import com.blochstech.bitcoincardterminal.Model.Model;
 import com.blochstech.bitcoincardterminal.Model.Communication.CurrencyApiConnector;
 import com.blochstech.bitcoincardterminal.Utils.Event;
@@ -20,18 +19,8 @@ public class PinPageVM {
 		stateUpdate();
 	}
 	
-	private void FeeCheckMin(double feeDollarValue){
-		Double btcVal = feeDollarValue / CurrencyApiConnector.DollarValue(Currency.Bitcoins);
-		if(btcVal < AppSettings.MIN_FEE_BITCOINS)
-		{
-			feeDollarValue = AppSettings.MIN_FEE_BITCOINS * CurrencyApiConnector.DollarValue(Currency.Bitcoins);
-			Model.Instance().setFee(feeDollarValue);
-		}
-	}
-	
 	public void stateUpdate(){
 		currency = Model.Instance().getCurrency();
-		FeeCheckMin(Model.Instance().getFee());
 		fullPriceDollarValue = Model.Instance().getPrice() + Model.Instance().getFee();
 		fullPrice = fullPriceDollarValue / CurrencyApiConnector.DollarValue(currency);
 		courtesyOk = Model.Instance().getCourtesyOK();
