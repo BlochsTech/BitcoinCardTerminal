@@ -201,7 +201,7 @@ public class CurrencyApiConnector {
 	}
 	//END WORKER
 	
-	public static void SynchPrices(String caller){
+	public synchronized static void SynchPrices(String caller){
 		
 		if(instance == null){
 			instance = new CurrencyApiConnector();
