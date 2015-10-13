@@ -105,7 +105,7 @@ public class SettingsPage extends Fragment {
 					}
 				});
 		    	
-		    	zBarScannerView.startCamera();
+		    	//zBarScannerView.startCamera();
 	    	}
     	}catch (Exception ex){
     		MessageManager.Instance().AddMessage(ex.toString(), true);
@@ -116,11 +116,13 @@ public class SettingsPage extends Fragment {
     	setupQRCodeScanner();
     	if(qrDialog != null){
     		qrDialog.show();
+    		stopOrStartCamera(true);
     	}
     }
     private void hideQrDialog(){
     	if(qrDialog != null){
     		qrDialog.hide();
+    		stopOrStartCamera(false);
     	}
     }
     private void stopOrStartCamera(boolean value){
@@ -196,7 +198,7 @@ public class SettingsPage extends Fragment {
     		feeBox.ignoreTextChanges(true);
     	if(addressBox != null)
     		addressBox.ignoreTextChanges(true);
-    	stopOrStartCamera(false);
+    	//stopOrStartCamera(false);
     	super.onPause();
     }
     
@@ -209,7 +211,7 @@ public class SettingsPage extends Fragment {
     		feeBox.ignoreTextChanges(false);
     	if(addressBox != null)
     		addressBox.ignoreTextChanges(false);
-    	stopOrStartCamera(true);
+    	//stopOrStartCamera(true);
     	update();
     }
     
