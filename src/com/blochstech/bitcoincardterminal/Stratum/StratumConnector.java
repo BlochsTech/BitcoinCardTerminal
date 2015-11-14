@@ -68,6 +68,8 @@ public class StratumConnector {
 			
 			boolean hasConnection = res != null && res.IsConnected && res.Response != null && res.Response.length() > 0
 					&& headerRes != null && headerRes.IsConnected && headerRes.Response != null && headerRes.Response .length() > 0;
+			if(!hasConnection)
+				socket = new Socket(serverManager.GetServer(), SERVER_PORT);
 			boolean txInBlock = hasConnection && res.Response.contains("merkle") &&
 					headerRes.Response.contains("prev_block_hash") && !res.Response.contains("error") && !headerRes.Response.contains("error");
 			BlockResponse result = new BlockResponse(hasConnection, txInBlock);
@@ -91,6 +93,13 @@ public class StratumConnector {
 			
 			return result;
 		}catch(Exception ex){
+			isBusy = false;
+			try {
+				socket = new Socket(serverManager.GetServer(), SERVER_PORT);
+			}catch(Exception socketEx){
+				if(Tags.DEBUG)
+					Log.e(Tags.APP_TAG, "StratumConnector.GetMekleBranch failed to get new socket. Ex: " + ex.toString());
+			}
 			if(Tags.DEBUG)
 				Log.e(Tags.APP_TAG, "StratumConnector.GetMekleBranch call failed. Ex: " + ex.toString());
 		}

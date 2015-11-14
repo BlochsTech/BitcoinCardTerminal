@@ -70,6 +70,19 @@ public class MainActivity extends FragmentActivity {
         MessageManager.Instance().AddMessage("Init " + Calendar.getInstance().getTime().toString(), false);
         
         Model.Instance(); //Init Model. (starts network task, among other things, that will upload pending TXs if there is network)
+        
+        //TEMP TEST
+        /*try{
+			TXObject parsedTX = TXUtil.ParseTXToObjectForm("0100000001C412E231F2941550BF4FB097FE231456072145BF9E8162670D3403E19E007D96020000008B483045022050CCF0CB8F8552BB13FE1338339572B578053428884D61DD5D7298249B906E9D02210091CDCC7DABB9E8D1BCAA47D6D022695EC49FB343CFA77385C4CAF90EB6BF990D014104E9C4C6AD2BE6D97BD4BBBA18FC51E62A0B4B393735FB8C0FB859253AAF4427789CE6D4D1B653C29D67B99E9DCCA1FBFAF1AB86AEBE50B5B277ECD8BA8DBCAC65FFFFFFFF025E150000000000001976A914B22A5A0F48C42A0219A4BFE146E2A2432D9F9E1388AC6D860000000000001976A9140044B6662B972525F7FB6C2B40D51AA4CB56BC5D88AC00000000");
+			if(parsedTX != null)
+				parsedTX = TXUtil.CorrectSignatureS(parsedTX);
+			Log.i(Tags.APP_TAG, parsedTX.HexValue);
+		}catch(Exception ex){
+			Log.e(Tags.APP_TAG, "Failed to correct potential high S values in TX." + (ex!=null?ex.toString():""));
+			if(Tags.DEBUG)
+				ex.printStackTrace();
+		}*/
+        //TEMP TEST
     }
     
     private void ListenForNFCIntent(){

@@ -15,6 +15,7 @@ import com.blochstech.bitcoincardterminal.Utils.Tags;
 import com.blochstech.bitcoincardterminal.Model.AppSettings;
 import com.blochstech.bitcoincardterminal.Model.Communication.NetworkCallbackMethods;
 import com.blochstech.bitcoincardterminal.Model.Communication.NetworkPublishResults.SendStatus;
+import com.blochstech.bitcoincardterminal.Model.Communication.Objects.TXObject;
 
 //Extends and uses a class that has its own worker thread, however this class runs on the main UIThread.
 //Only different thing is that it will take updates and asynchronously give the responses.
@@ -486,10 +487,27 @@ public class BitcoinCard extends NFCWrapper {
 								break;*/
 								
 								String tmpRes = ByteConversionUtil.byteArrayToHexString(ByteConversionUtil.toBytes(state.paymentTxBytes));
-								tmpRes = tmpRes + "";
+								TXObject parsedTX = null;
+								boolean failed = true;
 								
-								if(!state.waitingIsResetRequest && tmpRes != null && tmpRes.length() > 0){
-									networkConnector.publishTX(state.paymentTxBytes);
+								try{
+									parsedTX = TXUtil.ParseTXToObjectForm(tmpRes);
+									if(parsedTX != null)
+										parsedTX = TXUtil.CorrectSignatureS(parsedTX);
+									failed = false;
+								}catch(Exception ex){
+									messageEvent.fire(fireKey, new Message("Failed to correct potential high S values in TX." + (ex!=null?ex.toString():"") 
+											+ "\n" + tmpRes, MessageType.Error));
+									if(Tags.DEBUG)
+										ex.printStackTrace();
+								}
+								
+								//TODO: We must check low S value compliance and do it if not. Difficult to do on card? Possibly not since no division required.
+								//Even if possible on card, we have already sold some.
+								//TODO: Also do in card.. later!
+
+								if(!failed && parsedTX != null && !state.waitingIsResetRequest){
+									networkConnector.publishTX(ByteConversionUtil.toList(parsedTX.Bytes));
 								}
 								
 								//else if (state.waitingIsResetRequest){
@@ -562,7 +580,7 @@ public class BitcoinCard extends NFCWrapper {
 					if(Tags.DEBUG)
 						ex.printStackTrace(); //TODO: Make better unified logging system using printStackTrace nicely etc..
 					state.commandInProgress = BitcoinCallbackMethods.DebugOnce;
-					super.newTask(CardTaskUtil.getDebugTask());
+					super.newTask(CardTaskUtil.getDebugTask()); //TODO something wrong with checkIsNew or related logic in card... or terminal both? (See "Known defects")
 				}
 			}
 		}else{
