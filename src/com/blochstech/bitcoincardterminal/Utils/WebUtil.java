@@ -66,9 +66,10 @@ public class WebUtil {
 		return new SimpleWebResponse(netResult, true);
 	}
 	
-	public static void HttpResponseLog(HttpResponse response, String debugCallName){
+	//This method consumes response content, do not try to read it twice.
+	public static String HttpResponseLog(HttpResponse response, String debugCallName){
+		String netResult="", line;
 		try {
-			String netResult="", line;
 			BufferedReader br;
 			
 			br = new BufferedReader(
@@ -99,5 +100,6 @@ public class WebUtil {
 					e.printStackTrace();
 			}
 		}
+		return netResult;
 	}
 }

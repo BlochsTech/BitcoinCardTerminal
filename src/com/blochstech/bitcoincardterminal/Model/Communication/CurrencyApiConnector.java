@@ -81,16 +81,32 @@ public class CurrencyApiConnector {
 			SimpleWebResponse resp;
 			
 			//BTC rate:
+			boolean useBackup = false;
 			try{
-				resp = WebUtil.SimpleHttpGet(client, "https://api.coindesk.com/v1/bpi/currentprice.json", contentType, "CurrencyApiGet_BTC_Rate");
+				//https://www.bitstamp.net/api/ticker_hour/
+				resp = WebUtil.SimpleHttpGet(client, "http://api.coindesk.com/v1/bpi/currentprice.json", contentType, "CurrencyApiGet_BTC_Rate");
 				if(resp.IsConnected && resp.Response != null){
 					JSONObject json = new JSONObject(resp.Response);
 					JSONObject usdObject = json.getJSONObject("bpi").getJSONObject("USD");
 					result[5] = usdObject.getDouble("rate");
 				}
 			}catch(Exception ex){
+				useBackup = true;
 				if(Tags.DEBUG)
 					Log.e(Tags.APP_TAG, "Failed to get BTC/USD rate. Ex: " + ex.toString());
+			}
+			
+			if(useBackup){
+				try{
+					resp = WebUtil.SimpleHttpGet(client, "https://www.bitstamp.net/api/ticker_hour/", contentType, "CurrencyApiGet_BTC_Rate");
+					if(resp.IsConnected && resp.Response != null){
+						JSONObject json = new JSONObject(resp.Response);
+						result[5] = json.getDouble("last");
+					}
+				}catch(Exception ex){
+					if(Tags.DEBUG)
+						Log.e(Tags.APP_TAG, "Failed to get backup BTC/USD rate. Ex: " + ex.toString());
+				}
 			}
 
 			//MicroBtc rate:

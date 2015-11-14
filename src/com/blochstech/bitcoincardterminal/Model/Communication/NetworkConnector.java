@@ -378,29 +378,35 @@ class NetworkConnector {
 			response = client.execute(postRequest);
 			
 			boolean failed = false;
+			String failString = null;
 			if (response.getStatusLine().getStatusCode() != 200 && //Ok
 					response.getStatusLine().getStatusCode() != 522) { //Server busy
-				WebUtil.HttpResponseLog(response, "NetworkConnector.sendTransaction");
+				failString = WebUtil.HttpResponseLog(response, "NetworkConnector.sendTransaction"); //This consumes data, hence bool to avoid reuse of content.
 				failed = true;
 			}else if(response.getStatusLine().getStatusCode() == 522){ //Server busy
 				return new NetworkPublishResults(NetworkPublishResults.SendStatus.Retry, "Server busy, will retry. "
 						   + response.getStatusLine().getStatusCode());
 			}
 			
-			br = new BufferedReader(
-                    new InputStreamReader((response.getEntity().getContent())));
-
-			StringBuilder sb = new StringBuilder(500000); //0.5 megabyte, updgrade of all net code needed later - severely needed.
-			sb.append("");
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
+			String tempStr;
+			if(!failed){
+				br = new BufferedReader(
+	                    new InputStreamReader((response.getEntity().getContent())));
+	
+				StringBuilder sb = new StringBuilder(500000); //0.5 megabyte, updgrade of all net code needed later - severely needed.
+				sb.append("");
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+				}
+				
+				tempStr = sb.toString(); //TODO
+				tempStr = tempStr == null ? "" : tempStr;
+			}else{
+				tempStr = failString;
 			}
 			
-			String tempStr = sb.toString(); //TODO
-			tempStr = tempStr == null ? "" : tempStr;
-			
 			if(failed){
-				return new NetworkPublishResults(NetworkPublishResults.SendStatus.Invalid, "API error: " + tempStr);
+				return new NetworkPublishResults(NetworkPublishResults.SendStatus.Invalid, "API error: " + tempStr + " TXHex:" + txHex);
 			}else{
 				if(Tags.DEBUG)
 					Log.i(Tags.APP_TAG, "API: " + tempStr);

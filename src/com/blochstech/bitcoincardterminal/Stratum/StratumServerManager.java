@@ -13,19 +13,26 @@ public class StratumServerManager {
 	
 	//Simple add/remove at failures/server gets etc..
 	private LinkedList<String> serverUrls = new LinkedList<String>();
+	private int indexUsed = 0;
 	
 	//TODO: Persist server urls to disk later.
 	
 	public StratumServerManager(){
 		serverUrls = new LinkedList<String>();
-		serverUrls.add("tobias-neumann.eu");
-		serverUrls.add("electrum.mindspot.org");
-		serverUrls.add("wirerocks.infoha.us");
-		serverUrls.add("electrum.bitfuzz.nl");
+		//serverUrls.add("tobias-neumann.eu"); Gone
+		//serverUrls.add("electrum.mindspot.org"); SLOOOW disconnect
+		//serverUrls.add("wirerocks.infoha.us"); Does not exist
+		serverUrls.add("electrum.bitfuzz.nl"); //OK!
 	}
 	
 	public String GetServer(){
-		String tempRes = serverUrls.getFirst();
+		String tempRes = null;
+		
+		if(serverUrls.size() > indexUsed)
+			tempRes = serverUrls.get(indexUsed);
+		
+		indexUsed = (indexUsed+1) % serverUrls.size();
+		
 		return tempRes;
 	}
 	

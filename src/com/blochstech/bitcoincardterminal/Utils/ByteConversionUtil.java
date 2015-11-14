@@ -45,6 +45,10 @@ public class ByteConversionUtil {
 		
 		return res;
 	}
+	public static byte fromUnsigned(int singleUByte){
+		return (byte) (singleUByte >= 128 ? singleUByte - 256 : singleUByte);
+	}
+	
 	public static int[] toUnsigned(byte[] bytes) {
 		if (bytes == null)
 			return null;
@@ -57,8 +61,8 @@ public class ByteConversionUtil {
 		
 		return res;
 	}
-	public static int toUnsigned(byte singlebyte) {
-		return (int) (singlebyte < 0 ? singlebyte + 256 : singlebyte);
+	public static int toUnsigned(byte singleByte) {
+		return (int) (singleByte < 0 ? singleByte + 256 : singleByte);
 	}
 	
 	public static byte[] hexStringToByteArray(String s) {
@@ -260,6 +264,38 @@ public class ByteConversionUtil {
 		}
 		return simpleBytes;
 	}
+	
+	public static byte[] normalizeArray(byte[] bytes, int expectedLength) throws Exception{
+		if(bytes.length > expectedLength){
+			boolean invalid = false;
+			for(int i = bytes.length-1-expectedLength; i >= 0; i--){
+				if(bytes[i] != 0)
+				{
+					invalid = true;
+					break;
+				}
+			}
+			if(invalid)
+				throw new Exception("Longer byte array than expected by caller.");
+		}
+		
+		if(bytes.length == expectedLength)
+			return bytes;
+
+		return preAppendHighZeroPadding(bytes, expectedLength-bytes.length);
+	}
+	
+	public static byte[] preAppendHighZeroPadding(byte[] bytes, int zeroes){
+		byte[] result = new byte[bytes.length+zeroes];
+		for(int i = 0; i < result.length; i++){
+			if(i >= zeroes){
+				result[i] = bytes[i-zeroes];
+			}else{
+				result[i] = 0;
+			}
+		}
+		return result;
+	}
 
 	public static int[][] getSignatureIndexesAndLengths(LinkedList<Byte> PaymentTXBytes) throws Exception{
 		return getSignatureIndexesAndLengths(toSimpleBytes(PaymentTXBytes));
@@ -349,6 +385,25 @@ public class ByteConversionUtil {
     	return nbytes;
     }
     
+    public static byte[] concat(byte[] bytes, byte[] bytes2){
+    	if(bytes == null)
+    		return bytes2;
+    	if(bytes2 == null)
+    		return bytes;
+    	
+    	byte[] newArray = new byte[bytes.length + bytes2.length];
+    	
+    	for(int i = 0; i < newArray.length; i++){
+    		if(i < bytes.length){
+    			newArray[i] = bytes[i];
+    		}else{
+    			newArray[i] = bytes2[i-bytes.length];
+    		}
+    	}
+    	
+    	return newArray;
+    }
+    
     public static String reverseByteOrder(String hash){
     	if(RegexUtil.isMatch(hash, RegexUtil.CommonPatterns.BYTEHEX)){
     		String result = "";
@@ -359,6 +414,19 @@ public class ByteConversionUtil {
     	}else{
     		return null;
     	}
+    }
+    
+    public static byte[] reverseByteOrder(byte[] bytes){
+    	if(bytes == null)
+    		return null;
+    	
+    	byte[] result = new byte[bytes.length];
+    	
+    	for(int i = 0; i < bytes.length; i++){
+    		result[bytes.length-i-1] = bytes[i];
+    	}
+    	
+    	return result;
     }
     
     public static int merkleLevels(long x){
