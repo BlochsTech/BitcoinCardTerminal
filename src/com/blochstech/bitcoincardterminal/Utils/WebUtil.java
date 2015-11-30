@@ -3,6 +3,7 @@ package com.blochstech.bitcoincardterminal.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -10,6 +11,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 
+import com.blochstech.bitcoincardterminal.MainActivity;
+
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.util.Log;
 
@@ -101,5 +107,32 @@ public class WebUtil {
 			}
 		}
 		return netResult;
+	}
+	
+	public static boolean hasBasicConnection() {
+	    ConnectivityManager cm =
+	        (ConnectivityManager) MainActivity.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
+	    return netInfo != null && netInfo.isConnected();
+	}
+	
+	private static long lastCheckedMillis = 0;
+	private static boolean onlineStatus = false;
+	public static boolean IsOnline(){
+		if(System.currentTimeMillis() - lastCheckedMillis < 1500)
+			return onlineStatus;
+		
+		if(!hasBasicConnection())
+			return false;
+
+	    InetAddress byName;
+		try {
+			byName = InetAddress.getByName("74.125.224.72"); //Google.com
+		    boolean res = byName.isReachable(150);
+		    lastCheckedMillis = System.currentTimeMillis();
+		    return res;
+		} catch(Exception ex) {
+			return false;
+		}
 	}
 }

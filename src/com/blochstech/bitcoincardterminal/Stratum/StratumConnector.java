@@ -95,7 +95,10 @@ public class StratumConnector {
 		}catch(Exception ex){
 			isBusy = false;
 			try {
+				socket.close();
+				socket = null;
 				socket = new Socket(serverManager.GetServer(), SERVER_PORT);
+				return GetMekleBranch(txHash, blockHeight);
 			}catch(Exception socketEx){
 				if(Tags.DEBUG)
 					Log.e(Tags.APP_TAG, "StratumConnector.GetMekleBranch failed to get new socket. Ex: " + ex.toString());

@@ -24,11 +24,11 @@ public class CurrencyApiConnector {
 	
 	private static long lastSynched = 0;
 	//(In dollars)
-	private static double microbtcValue = 0.00024;
+	private static double microbtcValue = 0.00035;
 	private static double appleValue = 0.40;
-	private static double yuanValue = 0.16;
-	private static double euroValue = 1.12;
-	private static double btcValue = 240;
+	private static double yuanValue = 0.156;
+	private static double euroValue = 1.06;
+	private static double btcValue = 350;
 	
 	private static CurrencyApiConnector instance = null;
 	private static boolean isSynching = false;
@@ -228,8 +228,8 @@ public class CurrencyApiConnector {
 			} catch (Exception e) {
 				ratesCache = null;
 				if(Tags.DEBUG)
-					Log.e(Tags.APP_TAG, "CurrencyApiConnector could not instantiate cache, transactions will "
-						+ "be lost if they cannot immediately be relayed. " + e.getMessage());
+					Log.e(Tags.APP_TAG, "CurrencyApiConnector could not instantiate cache, rates "
+						+ "will be wrong if offline. " + e.getMessage());
 			}
 		}
 		

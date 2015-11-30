@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.blochstech.bitcoincardterminal"
-    android:versionCode="6"
-    android:versionName="2.1" >
+    android:versionCode="7"
+    android:versionName="2.2" >
     
     <supports-screens android:resizeable="false"
                   android:smallScreens="false"
@@ -16,7 +16,7 @@
     <uses-feature android:name="android.hardware.nfc" android:required="true" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--GIT Test <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
     <uses-permission android:name="android.permission.VIBRATE" />

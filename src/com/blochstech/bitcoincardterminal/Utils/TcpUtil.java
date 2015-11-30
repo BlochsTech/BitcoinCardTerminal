@@ -15,6 +15,7 @@ public class TcpUtil {
 	private static long lastCallMillis = 0;
 	public static SimpleWebResponse SendReceiveTcpMessage(Socket socket, String message) {
 		try{
+			socket.setSoTimeout(250);
 			InputStream inStream = socket.getInputStream();
 			PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())),
 			true);
@@ -36,8 +37,13 @@ public class TcpUtil {
 			
 			lastCallMillis = System.currentTimeMillis();
 			
+			char[] character = new char[1];
+			while(System.currentTimeMillis() - lastCallMillis < 250){ 
+				character = Character.toChars(input.read());
+				tcpResult += character[0];
+			}
 			//while ((line = input.readLine()) != null) {
-			tcpResult = input.readLine();
+			//tcpResult = input.readLine();
 			
 			return new SimpleWebResponse(tcpResult, true);
 		}catch(Exception ex){
