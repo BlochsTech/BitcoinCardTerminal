@@ -22,7 +22,8 @@ public class StratumServerManager {
 		//serverUrls.add("tobias-neumann.eu"); Gone
 		//serverUrls.add("electrum.mindspot.org"); SLOOOW disconnect
 		//serverUrls.add("wirerocks.infoha.us"); Does not exist
-		serverUrls.add("electrum.bitfuzz.nl"); //OK!
+		//serverUrls.add("electrum.bitfuzz.nl"); //OK!
+		serverUrls.add("VPS.hsmiths.com");
 	}
 	
 	public String GetServer(){
