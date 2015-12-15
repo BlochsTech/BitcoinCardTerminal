@@ -3,7 +3,6 @@ package com.blochstech.bitcoincardterminal.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -11,11 +10,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 
-import com.blochstech.bitcoincardterminal.MainActivity;
-
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.http.AndroidHttpClient;
 import android.util.Log;
 
@@ -109,7 +103,7 @@ public class WebUtil {
 		return netResult;
 	}
 	
-	public static boolean hasBasicConnection() {
+	/*public static boolean hasBasicConnection() {
 	    ConnectivityManager cm =
 	        (ConnectivityManager) MainActivity.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -134,5 +128,5 @@ public class WebUtil {
 		} catch(Exception ex) {
 			return false;
 		}
-	}
+	}*/
 }
