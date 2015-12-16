@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 
 import org.apache.http.HttpResponse;
@@ -189,7 +188,6 @@ class NetworkConnector {
 		private JSONArray jsonArray;
 		private SimpleTuple<Boolean,Object[]> objArray;
 		private SimpleTuple<Boolean,String[]> strArray;
-		private Date disconnectedStart = null;
 		
 		private void NoNewSourcesCode(){
 			state.noUsableNewSources = true; //Included in waitingForData check.
@@ -197,19 +195,12 @@ class NetworkConnector {
 			//Returns null TXData, subscriber should understand this means no new sources.
 		}
 		private void DisconnectedCode(){
-			if(disconnectedStart == null)
-				disconnectedStart = new Date();
-			
-			if((new Date()).getTime() - disconnectedStart.getTime() > 2000){ //GetTime returns millis.
-				state.noUsableNewSources = true;
-				disconnectedStart = null;
-				publishProgress(new EventUpdate(new Callback(NetworkCallbackMethods.NoConnection.Value(), (Object[])null)));
-			}
+			state.noUsableNewSources = true;
+			publishProgress(new EventUpdate(new Callback(NetworkCallbackMethods.NoConnection.Value(), (Object[])null)));
 		}
 		
 		protected Object doInBackground(Object... startParams) {
 		    boolean loop = true;
-		    boolean actionTaken = false;
 		    
 		    while(loop){
 		    	Enter();
@@ -226,7 +217,6 @@ class NetworkConnector {
 		    					}else if (strArray.FirstValue){
 		    						NoNewSourcesCode();
 		    					}else{
-		    						actionTaken = true; //Set to true causes immediate retry/re-loop.
 		    						DisconnectedCode();
 		    					}
 		    				}
@@ -244,7 +234,6 @@ class NetworkConnector {
 		    					}else if(objArray.FirstValue){
 		    						NoNewSourcesCode();
 		    					}else{
-		    						actionTaken = true; //Set to true causes immediate retry/re-loop.
 		    						DisconnectedCode();
 		    					}
 		    				}
@@ -264,7 +253,6 @@ class NetworkConnector {
 			    				}else if(blockResponse.HasConnection){
 		    						NoNewSourcesCode();
 		    					}else{
-		    						actionTaken = true; //Set to true causes immediate retry/re-loop.
 		    						DisconnectedCode();
 		    					}
 	    					}
@@ -336,12 +324,9 @@ class NetworkConnector {
 		    		
 		    	//If none of the above, leave and sleep.
 	    		try {
-	    			if(!actionTaken){
-    					Thread.sleep(1000); //Interrupts will wake this up.
-	    			}
+	    			Thread.sleep(1000); //Interrupts will wake this up.
 				} catch (InterruptedException e) { //InterruptedException
 				}
-	    		actionTaken = false;
 		    }
 		    return null;
 		}

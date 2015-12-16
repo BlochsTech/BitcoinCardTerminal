@@ -102,4 +102,31 @@ public class WebUtil {
 		}
 		return netResult;
 	}
+	
+	/*public static boolean hasBasicConnection() {
+	    ConnectivityManager cm =
+	        (ConnectivityManager) MainActivity.instance.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
+	    return netInfo != null && netInfo.isConnected();
+	}
+	
+	private static long lastCheckedMillis = 0;
+	private static boolean onlineStatus = false;
+	public static boolean IsOnline(){
+		if(System.currentTimeMillis() - lastCheckedMillis < 1500)
+			return onlineStatus;
+		
+		if(!hasBasicConnection())
+			return false;
+
+	    InetAddress byName;
+		try {
+			byName = InetAddress.getByName("74.125.224.72"); //Google.com
+		    boolean res = byName.isReachable(150);
+		    lastCheckedMillis = System.currentTimeMillis();
+		    return res;
+		} catch(Exception ex) {
+			return false;
+		}
+	}*/
 }

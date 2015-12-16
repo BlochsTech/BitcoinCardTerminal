@@ -1,7 +1,7 @@
 package com.blochstech.bitcoincardterminal.Stratum;
 
+import java.net.InetSocketAddress;
 import java.net.Socket;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,7 +29,6 @@ public class StratumConnector {
 	private static StratumServerManager serverManager;
 	
 	//TCP stuff:
-	private static final int SERVER_PORT = 50001;
 	private static Socket socket;
 	
 	
@@ -42,40 +41,66 @@ public class StratumConnector {
 		serverManager = new StratumServerManager();
 	}
 	
-	private static boolean isBusy = false;
-	
 	//Do not call on main thread.
 	public synchronized static BlockResponse GetMekleBranch(String txHash, String blockHeight){
-		if(isBusy)
-			return new BlockResponse(false, false);
-		isBusy = true;
 		if(serverManager == null)
 			serverManager = new StratumServerManager();
 
 		String revTxHash = ByteConversionUtil.reverseByteOrder(txHash);
 		
 		try{
-			if(socket == null)
-				socket = new Socket(serverManager.GetServer(), SERVER_PORT);
-		
-			SimpleWebResponse res = TcpUtil.SendReceiveTcpMessage(socket, 
-					"{ \"id\": 1, \"method\": \"blockchain.transaction.get_merkle\", \"params\": [ \""+revTxHash+"\", "+blockHeight+" ] }\n");
+			SimpleWebResponse res = null;
+			SimpleWebResponse headerRes = null;
 			
-			SimpleWebResponse headerRes = TcpUtil.SendReceiveTcpMessage(socket, 
-					"{ \"id\": 1, \"method\": \"blockchain.block.get_header\", \"params\": [ "+blockHeight+" ] }\n");
+			BlockResponse result = new BlockResponse(false, false);
 			
-			isBusy = false;
+			int tries = 0;
+			boolean retry = true;
 			
-			boolean hasConnection = res != null && res.IsConnected && res.Response != null && res.Response.length() > 0
-					&& headerRes != null && headerRes.IsConnected && headerRes.Response != null && headerRes.Response .length() > 0;
-			if(!hasConnection)
-				socket = new Socket(serverManager.GetServer(), SERVER_PORT);
-			boolean txInBlock = hasConnection && res.Response.contains("merkle") &&
-					headerRes.Response.contains("prev_block_hash") && !res.Response.contains("error") && !headerRes.Response.contains("error");
-			BlockResponse result = new BlockResponse(hasConnection, txInBlock);
-			if(!hasConnection || !txInBlock)
-				return result;
+			boolean hasConnection = false, txInBlock = false, wasExeption;
+			
+			while(tries < 3 && retry){
+				tries++;
+				retry = false;
+				wasExeption = false;
+				try{
+					if(socket == null){ //This fails on bad servers, handle it.
+						socket = new Socket();
+						socket.connect(new InetSocketAddress(serverManager.GetServer(), StratumServer.SERVER_PORT), 4000);
+					}
+					
+					res = TcpUtil.SendReceiveTcpMessage(socket, 
+							"{ \"id\": 1, \"method\": \"blockchain.transaction.get_merkle\", \"params\": [ \""+revTxHash+"\", "+blockHeight+" ] }\n");
+					
+					headerRes = TcpUtil.SendReceiveTcpMessage(socket, 
+							"{ \"id\": 1, \"method\": \"blockchain.block.get_header\", \"params\": [ "+blockHeight+" ] }\n");
+					
+					hasConnection = res != null && res.IsConnected && res.Response != null && res.Response.length() > 0
+							&& headerRes != null && headerRes.IsConnected && headerRes.Response != null && headerRes.Response .length() > 0;
 
+					txInBlock = hasConnection && res.Response.contains("merkle") &&
+							headerRes.Response.contains("prev_block_hash") && !res.Response.contains("error") && !headerRes.Response.contains("error");
+					result = new BlockResponse(hasConnection, txInBlock);
+	
+					retry = !hasConnection || !txInBlock;
+				}catch(Exception ex){
+					if(Tags.DEBUG)
+						Log.w(Tags.APP_TAG, "StratumConnector.GetMekleBranch failed, retrying with new socket. Ex: " + ex.toString());
+					
+					wasExeption = true;
+					retry = true;
+				}
+				
+				if(retry){
+					if(socket != null)
+						socket.close();
+					serverManager.ServerIssue(wasExeption);
+					socket = null;
+				}
+			}
+			if(!hasConnection || !txInBlock || headerRes == null || res == null)
+				return result;
+			
 			JSONObject json = new JSONObject(headerRes.Response);
 			json = json.getJSONObject("result");
 			result.Bits = json.getString("bits");
@@ -93,13 +118,6 @@ public class StratumConnector {
 			
 			return result;
 		}catch(Exception ex){
-			isBusy = false;
-			try {
-				socket = new Socket(serverManager.GetServer(), SERVER_PORT);
-			}catch(Exception socketEx){
-				if(Tags.DEBUG)
-					Log.e(Tags.APP_TAG, "StratumConnector.GetMekleBranch failed to get new socket. Ex: " + ex.toString());
-			}
 			if(Tags.DEBUG)
 				Log.e(Tags.APP_TAG, "StratumConnector.GetMekleBranch call failed. Ex: " + ex.toString());
 		}
