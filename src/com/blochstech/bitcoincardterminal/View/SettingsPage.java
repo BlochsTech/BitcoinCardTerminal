@@ -287,12 +287,14 @@ public class SettingsPage extends Fragment {
     
     private Dialog dialog = null;
     private void showAddressDialog(){
+    	boolean createdNow = false;
     	//set up dialog
     	if(dialog == null)
     	{
+    		createdNow = true;
 	        dialog = new Dialog(MainActivity.instance); //TODO: Clean that a bit...
 	        dialog.setContentView(R.layout.addressloaddialog);
-	        dialog.setTitle("How do you want to input the address?");
+	        dialog.setTitle("Choose input type:");
 	        dialog.setCancelable(true);
 	        //there are a lot of settings, for dialog, check them all out!
 
@@ -330,10 +332,15 @@ public class SettingsPage extends Fragment {
 	        });
     	}
         
-        //now that the dialog is set up, it's time to show it    
-        dialog.show();
-    }
-    
+        //now that the dialog is set up, it's time to show it
+    	try{
+    		dialog.show();
+    	}catch(Exception ex){
+    		dialog = null;
+    		if(!createdNow)
+    			showAddressDialog();
+    	}
+    } 
    
     
 	private void selectButton(Currency currency){

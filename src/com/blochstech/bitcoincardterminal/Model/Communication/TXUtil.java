@@ -3,8 +3,11 @@ package com.blochstech.bitcoincardterminal.Model.Communication;
 import java.math.BigInteger;
 import java.util.LinkedList;
 
+import android.util.Log;
+
 import com.blochstech.bitcoincardterminal.Model.Communication.Objects.*;
 import com.blochstech.bitcoincardterminal.Utils.ByteConversionUtil;
+import com.blochstech.bitcoincardterminal.Utils.Tags;
 
 public class TXUtil {
 	public static TXObject ParseTXToObjectForm(String txHex) throws Exception{
@@ -128,6 +131,9 @@ public class TXUtil {
 		
 		BigInteger S = new BigInteger(sBytes);
 		if(S.compareTo(maxValue) > 0){
+			if(Tags.DEBUG)
+				Log.w(Tags.APP_TAG, "S value above max, terminal had to correct it.");
+			
 			//Do change:
 			if(S.compareTo(pivotValue) > 0)
 				throw new Exception("New S value would be negative.");
