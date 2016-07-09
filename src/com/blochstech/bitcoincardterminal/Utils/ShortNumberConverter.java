@@ -14,6 +14,7 @@ public class ShortNumberConverter {
 	    String temp = formatter.format(value);
 	    
 	    String temp2 = temp.substring(0, 5);
+	    temp2 = temp2.replace(",", ".");
 	    Double temp3 = Double.parseDouble(temp2);
 	    formatter = new DecimalFormat("0.00");
 	    formatter.setRoundingMode(RoundingMode.HALF_UP);

@@ -129,10 +129,12 @@ public class SettingsPageVM {
 		public void onEvent(Object event) {
 			try{
 				String cardAddress = Model.Instance().getCardAddress();
-				if(useNfc && cardAddress != null && cardAddress.length() > 0){
-					useNfc = false;
-					Address(cardAddress);
-					UpdateEvent.fire(fireKey, null);
+				if(cardAddress != null && cardAddress.length() > 0){
+					if(useNfc){
+						useNfc = false;
+						Address(cardAddress);
+						UpdateEvent.fire(fireKey, null);
+					}
 				}
 			}catch (Exception ex){
 	    		MessageManager.Instance().AddMessage(ex.toString(), true);
