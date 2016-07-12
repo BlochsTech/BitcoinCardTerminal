@@ -1,5 +1,11 @@
 package com.blochstech.bitcoincardterminal.Interfaces;
 
+import android.util.Log;
+import android.widget.Toast;
+
+import com.blochstech.bitcoincardterminal.MainActivity;
+import com.blochstech.bitcoincardterminal.Utils.Tags;
+
 public enum Currency {
 	MicroBitcoins(0),
 	Apples(1),
@@ -16,7 +22,15 @@ public enum Currency {
       return value;
 	}
 	public static Currency Convert(int value){
-		return Currency.values()[value];
+		if(0 <= value && value < Currency.values().length)
+			return Currency.values()[value];
+		else{
+			//TODO: Better unified logging util.
+			if(Tags.DEBUG)
+				Log.e(Tags.APP_TAG, "Attempted to convert invalid integer " + value + " to currency.");
+			Toast.makeText(MainActivity.GetMainContext(), "ERR: Attempted to convert invalid integer " + value + " to currency.", Toast.LENGTH_LONG).show();
+			return Currency.MicroBitcoins;
+		}
 	}
 	public String Description(){
 		switch(value){
