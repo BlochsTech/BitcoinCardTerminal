@@ -87,7 +87,7 @@ public class DAL implements IDAL {
 		} catch (Exception e) {
 			messageEvent.fire(this, new Message("Error: " + e.getMessage() + e.toString(), MessageType.Error));
 		}
-		return null;
+		return "0.0";
 	}
 	
 	@Override

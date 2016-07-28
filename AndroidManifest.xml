@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.blochstech.bitcoincardterminal"
-    android:versionCode="11"
-    android:versionName="2.6" >
+    android:versionCode="12"
+    android:versionName="2.7" >
     
     <supports-screens android:resizeable="false"
                   android:smallScreens="false"
